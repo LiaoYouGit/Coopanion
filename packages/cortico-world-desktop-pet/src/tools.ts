@@ -43,11 +43,11 @@ export const petToolDecls = (language: Language = 'zh'): Array<Omit<ToolDef, 'ha
   {
     name: 'pet_move_to',
     tags: ['act'],
-    description: 'Go somewhere on the screen the pet is on: walk (or run) along its bottom edge to a position, or go to one of the targets the current figure has of its own, which the environment section lists when it has any. Returns on arrival or interruption, after 30 seconds at most.',
+    description: 'Go somewhere on the screen the pet is on: walk (or run) along its bottom edge to a position, cross to the screen next to this one, or go to one of the targets the current figure has of its own, which the environment section lists when it has any. Returns on arrival or interruption, after 30 seconds at most.',
     parameters: {
       type: 'object',
       properties: {
-        to: { description: 'Target: a number from 0 to 1 (a fraction of the width of the screen the pet is on, 0 leftmost, 1 rightmost), left / center / right / cursor (the horizontal position of the mouse pointer), or the id of one of the current figure\'s own targets.', anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'string' }] },
+        to: { description: 'Target: a number from 0 to 1 (a fraction of the width of the screen the pet is on, 0 leftmost, 1 rightmost), left / center / right / cursor (the horizontal position of the mouse pointer), next-screen / prev-screen (the screen past the right / left edge, when there is one), or the id of one of the current figure\'s own targets.', anyOf: [{ type: 'number', minimum: 0, maximum: 1 }, { type: 'string' }] },
         run: { type: 'boolean', description: 'true to run; walks by default.' },
         params: { type: 'array', items: { type: 'number' }, maxItems: MOVE_PARAMS_MAX, description: 'Only for a figure\'s own target that takes numbers: them, in the order the environment section lists them.' },
       },

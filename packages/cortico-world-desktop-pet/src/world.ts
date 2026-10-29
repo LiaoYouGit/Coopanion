@@ -1106,6 +1106,7 @@ export class DesktopPetWorld implements World {
         w.resolve(msg.t === 'arrived' ? (name === undefined ? t.walkArrived(at) : t.moveArrived(name, at))
           : w.stopping ? (name === undefined ? t.walkStopped(at) : t.moveStopped(name, at))
           : msg.by === 'drag' ? (name === undefined ? t.walkGrabbed(at, this.userName) : t.moveGrabbed(name, at, this.userName))
+          : msg.by === 'noscreen' && name === undefined ? t.walkNoScreen(at)
           : name === undefined ? t.walkReplaced(at, by) : t.moveFailed(name, at, by));
         return;
       }

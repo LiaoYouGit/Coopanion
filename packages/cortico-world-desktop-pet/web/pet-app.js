@@ -338,10 +338,20 @@ function setBody(change) {
 
 /* ---------- body events → World ---------- */
 const walkTargets = new Map();
+/** `pet_move_to`'s crossing targets, as the direction to walk off in: the window follows onto the screen past that edge. */
+const CROSSINGS = { 'next-screen': 'right', 'prev-screen': 'left' };
+/** Where a crossing ends on the screen walked into, as a share of its width from the edge walked in at. */
+const CROSS_REST = .2;
+/** The crossings under way, by walkId: the direction walked off and whether to run, then null once on the last leg. */
+const crossings = new Map();
 function onBody(kind, d) {
   if (kind === 'arrived' || kind === 'interrupted') {
     if (!d.walkId || !walkTargets.has(d.walkId)) return;
+    // the first leg of a crossing (to the edge) moves the window onto the screen past it; only the last leg reports
+    const cross = crossings.get(d.walkId);
+    if (kind === 'arrived' && cross) { crossOver(d.walkId, cross, d); return; }
     walkTargets.delete(d.walkId);
+    crossings.delete(d.walkId);
     const y = typeof d.y === 'number' ? d.y : at()?.y;
     send({ t: kind, walkId: d.walkId, x: (typeof d.x === 'number' ? d.x : at()?.x ?? 0) / innerWidth, ...(typeof y === 'number' ? { y: y / innerHeight } : {}), by: d.by });
   } else if (kind === 'touch') {
@@ -361,8 +371,40 @@ function walk(m) {
   if (!body) { send({ t: 'interrupted', walkId: m.id, x: .5, by: 'none' }); return; }
   walkTargets.set(m.id, true);
   if (m.t === 'move') { body.move(m.move, m.id); return; }
+  const dir = CROSSINGS[m.to];
+  if (dir) {
+    crossings.set(m.id, { dir, run: !!m.run });
+    body.walk(dir === 'right' ? innerWidth : 0, !!m.run, m.id);
+    return;
+  }
   const x = m.to === 'cursor' ? (pointerSeen ? lastPointer.x : innerWidth / 2) : clamp(Number(m.to), 0, 1) * innerWidth;
   body.walk(x, !!m.run, m.id);
+}
+
+/**
+ * The body stands at the screen's edge: the window moves onto the display past it and the walk goes on
+ * there, ending a little way in. With no screen that way, or the pet picked up while the window was
+ * moving, the walk is given up and the World told where the body stands.
+ */
+async function crossOver(id, cross, arrivedAt) {
+  const to = await host?.crossScreen?.(cross.dir).catch(() => null);
+  if (!walkTargets.has(id)) return;
+  const mode = at()?.mode;
+  if (!to || mode === 'drag' || mode === 'air') {
+    walkTargets.delete(id); crossings.delete(id);
+    send({ t: 'interrupted', walkId: id, x: (typeof arrivedAt.x === 'number' ? arrivedAt.x : at()?.x ?? 0) / innerWidth, by: to ? 'drag' : 'noscreen' });
+    return;
+  }
+  // until the walk goes on, the body still stands in the display it left's coordinates
+  const was = at();
+  document.body.style.visibility = 'hidden';
+  try {
+    await settleSize(to);
+    body?.place(was.x + to.dx, cross.dir === 'right' ? 1 : -1, typeof was.y === 'number' ? was.y + to.dy : undefined);
+  } finally { document.body.style.visibility = ''; }
+  if (!walkTargets.has(id)) { crossings.delete(id); return; }
+  crossings.set(id, null);
+  body?.walk((cross.dir === 'right' ? CROSS_REST : 1 - CROSS_REST) * innerWidth, cross.run, id);
 }
 
 /* ---------- actions: words of the body's vocabulary, one after another ---------- */

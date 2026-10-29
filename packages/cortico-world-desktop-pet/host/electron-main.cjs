@@ -6,9 +6,9 @@
  * the window closes once that process exits. The window covers the work area of one display
  * (the primary one at start), short of the edge an auto-hidden taskbar waits on, is transparent
  * and always on top, and ignores the mouse until the page reports the pointer is over the figure,
- * a bubble or the menu. When the pet is carried onto
- * another display, the window moves to that display mid-drag; when its display is unplugged, it
- * moves to the primary one. A tray icon shows, hides and closes it; an embedding app that has its
+ * a bubble or the menu. When a walk crosses an edge or the pet is carried onto another display, the
+ * window moves onto that display; when its display is unplugged, it moves to the primary one. A tray
+ * icon shows, hides and closes it; an embedding app that has its
  * own tray passes `tray: false`.
  *
  * On macOS the window shows on every Space and over full-screen apps, the process keeps out of
@@ -48,6 +48,8 @@ const WINDOWS_EVERY_MS = 700;
 const FULLSCREEN_EVERY_MS = 200;
 /** Most pixels one backdrop sample returns. */
 const BACKDROP_SAMPLES = 1500;
+/** How far past an edge the probe for a neighboring display sits, in DIP: past the gap a hand-placed arrangement can leave between two displays. */
+const EDGE_PROBE = 150;
 
 /**
  * GDI calls for copying a small patch of the screen, or null off Windows or when koffi does not
@@ -501,6 +503,23 @@ function runPetHost({ url, parentPid = 0, tray: withTray = true }) {
     if (d.id === fromDisplay.id) return null;
     const from = coverArea(fromDisplay), wa = cover(d);
     return { x: pt.x - wa.x, y: pt.y - wa.y, w: wa.width, h: wa.height, dx: from.x - wa.x, dy: from.y - wa.y };
+  });
+
+  /**
+   * A walk carried off an edge: the display past `dir` ('left' or 'right') of the window's, found from
+   * a point a little way off that edge at the work area's mid-height, or null when there is none (a
+   * lone display, or one only above or below). Moves the window onto it and answers { w, h, dx, dy }
+   * like `pet:followCursor`: the window's new size, and how far a point on screen moved in page
+   * coordinates.
+   */
+  handlePet('pet:crossScreen', (_e, dir) => {
+    if (!win || (dir !== 'left' && dir !== 'right')) return null;
+    const from = display(), b = from.bounds, area = coverArea(from);
+    const pt = { x: dir === 'right' ? b.x + b.width + EDGE_PROBE : b.x - EDGE_PROBE, y: area.y + area.height / 2 };
+    const d = screen.getDisplayNearestPoint(pt);
+    if (!d || d.id === from.id) return null;
+    const wa = cover(d);
+    return { w: wa.width, h: wa.height, dx: area.x - wa.x, dy: area.y - wa.y };
   });
 
   // a pet is not an app to switch to

@@ -52,7 +52,7 @@ export const EFFECTS_REACH_MAX = 2;
 export const MOVES_MAX = 8;
 export const MOVE_PARAMS_MAX = 2;
 /** What `pet_move_to` takes as a target of its own; a pack's target cannot be one of these or a number. */
-export const DEFAULT_TARGETS = ['left', 'center', 'right', 'cursor'] as const;
+export const DEFAULT_TARGETS = ['left', 'center', 'right', 'cursor', 'next-screen', 'prev-screen'] as const;
 /** Audio files every platform's Chromium decodes. */
 const AUDIO = new Set(['.ogg', '.mp3', '.wav']);
 

@@ -1,8 +1,10 @@
 /**
  * The targets `pet_move_to` takes. Every figure that walks has the default ones: a share of the width of
- * the screen the pet is on, or left / center / right / cursor. A pack may declare more (`moves` in its
- * figure.json, src/packs.ts): a call to one of them is checked against the declaration here, then goes to
- * the body as it is (`body.move` in web/figure-frame.js), which decides where that is and how it gets there.
+ * the screen the pet is on, left / center / right / cursor, or next-screen / prev-screen, which walk off
+ * the right / left edge onto the screen there and end a little way in. A pack may declare more (`moves`
+ * in its figure.json, src/packs.ts): a call to one of them is checked against the declaration here, then
+ * goes to the body as it is (`body.move` in web/figure-frame.js), which decides where that is and how it
+ * gets there.
  *
  * The tool's parameters stay the same whatever pack is on, so changing figures leaves the tool list as it is;
  * the bot learns a pack's targets from the environment prompt (`moveTable`) and how they changed from the
@@ -11,12 +13,12 @@
 import type { ModelLanguage } from './model-text.ts';
 import { nameIn, type MoveParam, type MoveTarget } from './packs.ts';
 
-/** Where the default targets are, as a share of the screen's width; `cursor` is the mouse pointer's x. */
-const NAMED: Record<string, number | 'cursor'> = { left: .05, center: .5, right: .95, cursor: 'cursor' };
+/** A named default target: where the walk ends as a share of the screen's width (`cursor` is the mouse pointer's x), or the edge to walk off onto the screen there. */
+const NAMED: Record<string, number | 'cursor' | 'next-screen' | 'prev-screen'> = { left: .05, center: .5, right: .95, cursor: 'cursor', 'next-screen': 'next-screen', 'prev-screen': 'prev-screen' };
 
 export type MoveOrder =
-  /** A default target: the page walks the body there. */
-  | { kind: 'walk'; to: number | 'cursor'; run: boolean }
+  /** A default target: the page walks the body there; a crossing target hands the window to the screen past that edge. */
+  | { kind: 'walk'; to: number | 'cursor' | 'next-screen' | 'prev-screen'; run: boolean }
   /** One of the pack's targets: what the body gets, the params named by their ids. */
   | { kind: 'move'; target: MoveTarget; to: string; run: boolean; params: Record<string, number> }
   /** `noTarget`: no `to`; `badTarget`: neither a default target nor one of the pack's; `badParams`: params the target does not take. */

@@ -98,7 +98,7 @@ describe('figure packs', () => {
     expect(m.moves).toEqual([shelf]);
     expect(skipped).toHaveLength(1);
     // a default target's name or a number would never reach the pack; a number without bounds is not a parameter
-    for (const id of ['left', 'cursor', '0.5']) expect(readManifest(pack({ ...base, moves: [{ ...shelf, id }] }))).toMatch(/moves/);
+    for (const id of ['left', 'cursor', 'next-screen', '0.5']) expect(readManifest(pack({ ...base, moves: [{ ...shelf, id }] }))).toMatch(/moves/);
     expect(readManifest(pack({ ...base, moves: [{ ...shelf, params: [{ id: 'height', about: { zh: '跳多高' }, min: 1, max: 1 }] }] }))).toMatch(/params/);
     expect(readManifest(pack({ ...base, moves: [{ ...shelf, params: [1, 2, 3].map((i) => ({ id: `p${i}`, about: { zh: '量' }, min: 0, max: 1 })) }] }))).toMatch(/params/);
   });

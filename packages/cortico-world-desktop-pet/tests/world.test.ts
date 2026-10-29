@@ -251,6 +251,17 @@ describe('with a pet page', () => {
     expect(await tool(world, 'pet_move_to').handler({ to: 'moon' }, ctx)).toMatchObject({ failed: true });
   });
 
+  it("pet_move_to's crossing target goes to the page as it is, and a walk off an edge with no screen there is reported", async () => {
+    const { world } = await mounted();
+    const page = await FakePage.open(origin(world));
+    cleanup.push(() => page.close());
+    const crossing = tool(world, 'pet_move_to').handler({ to: 'next-screen', run: true }, ctx);
+    const walk = await page.next((m) => m.t === 'walk');
+    expect(walk).toMatchObject({ to: 'next-screen', run: true });
+    page.send({ t: 'interrupted', walkId: walk.id, x: .97, by: 'noscreen' });
+    expect(await crossing).toEqual({ text: '没走到:这一侧没有相邻的屏幕,停在屏幕横向 97% 处。' });
+  });
+
   it("a figure's own target goes to its body with the params checked against the pack, and the bot hears of it from the prompt and on a switch", async () => {
     const root = mkdtempSync(join(tmpdir(), 'packs-'));
     mkdirSync(join(root, 'robot'));

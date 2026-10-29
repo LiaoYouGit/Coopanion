@@ -25,7 +25,7 @@ One question with 1–3 options, plus by default a box for {{pet.user}} to write
 
 ### Moving and acting
 
-- `pet_move_to`: walk somewhere on the screen the body is on, 0 leftmost, 1 rightmost; `cursor` is the horizontal position of the mouse pointer. Returns only on arrival or interruption.
+- `pet_move_to`: walk somewhere on the screen the body is on, 0 leftmost, 1 rightmost; `cursor` is the horizontal position of the mouse pointer; `next-screen` / `prev-screen` walk off the right / left edge onto the screen there, when there is one. Returns only on arrival or interruption.
 - `pet_act`: play a sequence of expressions or motions without speaking. Words the vocabulary marks as held until the next action stay on.
 
 {{pet.moves}}

@@ -31,6 +31,8 @@ contextBridge.exposeInMainWorld('petHost', {
   sampleBackdrop: (rect, skip) => ipcRenderer.invoke('pet:sampleBackdrop', { rect, skip }),
   /** Moves the window to the display under the cursor: { x, y } the cursor and { w, h } the new size in page pixels, or null when it stays. */
   followCursor: () => ipcRenderer.invoke('pet:followCursor'),
+  /** Moves the window onto the display `dir` ('left' | 'right') of its own: { w, h } the new size and (dx, dy) how far a point on screen moved, in page pixels, or null when there is none. */
+  crossScreen: (dir) => ipcRenderer.invoke('pet:crossScreen', dir),
   /** Whether the window streams to the World's OBS overlay; while it does, the page reports each frame with `overlayFrame`. */
   onOverlay: (cb) => ipcRenderer.on('pet:overlay', (_e, on) => cb(!!on)),
   /** A frame drawn: the part of the page the overlay shows (the pet and its bubbles) in page pixels or null, and when it was drawn (ms since the epoch). */
