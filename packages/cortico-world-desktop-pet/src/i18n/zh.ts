@@ -270,6 +270,11 @@ export default {
     port: { title: '页面端口', description: '被占用时向上顺延。' },
     touchEnabled: { title: '互动发成事件', description: '戳、摸、拎起来甩出去。' },
     touchWakeOn: { title: '回应模式', description: 'poke：只有戳一下马上回应，其余互动等下次回应时一并送达；all：所有互动都马上回应；none：所有互动都等下次回应时一并送达；custom：按「习惯」页勾选的互动马上回应。一次互动得到回应之后、本轮结束之前的互动，都等下次回应时一并送达。' },
+    idleChatEnabled: { title: '主动找你聊天', description: '一段时间没互动时，Coo 自己找个话题主动说一两句，比如求摸摸、聊聊昨晚做的梦、分享自己碰到的小趣事。' },
+    idleChatMinutes: { title: '安静多久后开口', description: '距上一次互动这么久就可能开口，每次会有些随机，不像定时器。', suffix: '分钟' },
+    idleChatQuietFrom: { title: '免打扰从', description: '这段时间里不主动开口，跨零点的时段也行。' },
+    idleChatQuietTo: { title: '免打扰到', description: '和「免打扰从」填一样就是不设免打扰。' },
+    idleChatQuiet: { description: '这段时间里不主动开口，跨零点的时段也行；和「免打扰从」填一样就是不设免打扰。' },
     sound: { title: '音效总开关', description: '桌宠菜单里的音效按钮切的就是这个。' },
     sounds: {
       move: { title: '动作', description: '走路、跑、跳、落地、被甩出去、点头、摇头、转圈、晕、发抖、跳舞、张望。' },

@@ -754,6 +754,19 @@ describe('chat page', () => {
     expect(chatItem(host.stored[0]!)).toMatchObject({ kind: 'say', beats: [], images: [{ mime: 'image/png' }] });
   });
 
+  it('after the quiet minutes the pet starts a chat itself, but not while the quiet window holds', async () => {
+    const { world, host } = await mounted((c) => { c.idleChat = { enabled: true, minutes: 0, quietFrom: '00:00', quietTo: '00:00' }; });
+    const page = await FakePage.open(origin(world));
+    cleanup.push(() => page.close());
+    await expect.poll(() => host.events.some((e) => e.type === 'desktop-pet.idle'), { timeout: 10_000 }).toBe(true);
+
+    const quiet = await mounted((c) => { c.idleChat = { enabled: true, minutes: 0, quietFrom: '00:00', quietTo: '23:59' }; });
+    const qpage = await FakePage.open(origin(quiet.world));
+    cleanup.push(() => qpage.close());
+    await new Promise((resolve) => setTimeout(resolve, 6500));
+    expect(quiet.host.events.some((e) => e.type === 'desktop-pet.idle')).toBe(false);
+  });
+
   it('shows the figure and dress switches the person makes, not the ones the bot makes', async () => {
     const root = mkdtempSync(join(tmpdir(), 'packs-'));
     mkdirSync(join(root, 'robot'));

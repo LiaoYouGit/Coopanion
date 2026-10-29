@@ -31,7 +31,7 @@ import type { Language } from 'cortico/core/language.ts';
 import type { DeepPartial } from 'cortico/world.ts';
 import {
   DESKTOP_PET_ID, MAX_HOVER_BUTTONS, PET_ACTIONS, SELF_KEYS, THRESHOLD_DB_MAX, THRESHOLD_DB_MIN, TOUCH_KINDS, USER_MAX, asrEngineFor,
-  desktopPetConfigGroups, directSettings, hoverButtonList, selfAdjustMode, speechFor, touchWakes,
+  clockMinutes, desktopPetConfigGroups, directSettings, hoverButtonList, inClockWindow, selfAdjustMode, speechFor, touchWakes,
   type AsrEngine, type DesktopPetConfigSection, type MicMode, type PetSkin, type PetTheme, type RoamMode, type SelfKey,
 } from './config.ts';
 import { capFor, cutChars, petText, type PetText } from './i18n/index.ts';
@@ -107,6 +107,8 @@ const HOTKEY_POLL_MS = 30;
  * segmenter is flushed when the key goes up, and frames that arrive later are not used.
  */
 const MIC_RELEASE_MS = 500;
+/** How often the idle-chat check runs; a missed beat only delays the self-started line by this much. */
+const IDLE_CHAT_TICK_MS = 5_000;
 
 /**
  * Run controls an embedding app lends the pet's menu. Each button shows only when its control is
@@ -374,6 +376,9 @@ export class DesktopPetWorld implements World {
   private stampDay = '';
   private prefsKey = '';
   private prefsTimer: NodeJS.Timeout | null = null;
+  /** When the pet may start a little chat by itself; the clock restarts at every interaction and at every line it says. */
+  private idleChatDueAt = 0;
+  private idleChatTimer: NodeJS.Timeout | null = null;
   /** Where the pet window last said the pet stands, measured as `petX` is; written by `savePosition` on stop. */
   private standX: number | null = null;
   /** How far down it stands, as `petY` is measured, when the body reported one with that position. */
@@ -674,6 +679,8 @@ export class DesktopPetWorld implements World {
     await this.syncTypeKey();
     this.prefsKey = this.prefsSignature();
     this.prefsTimer = setInterval(() => this.syncPrefs(), PREFS_SYNC_MS);
+    this.idleChatArm();
+    this.idleChatTimer = setInterval(() => this.idleChatTick(), IDLE_CHAT_TICK_MS);
   }
 
   async stop(): Promise<void> {
@@ -684,6 +691,8 @@ export class DesktopPetWorld implements World {
     this.quiet = null;
     if (this.prefsTimer) clearInterval(this.prefsTimer);
     this.prefsTimer = null;
+    if (this.idleChatTimer) clearInterval(this.idleChatTimer);
+    this.idleChatTimer = null;
     this.savePosition();
     await this.importer?.cancel();
     if (this.packTimer) clearTimeout(this.packTimer);
@@ -1329,6 +1338,7 @@ export class DesktopPetWorld implements World {
   ): Promise<EventEnvelope | null> {
     const host = this.host;
     if (!host) return null;
+    if (type !== 'desktop-pet.idle') this.idleChatArm(); // any interaction restarts the quiet stretch; the idle line itself does not
     try {
       const e = await host.pushEvent({ type, source: this.id, senderKey, ts: nowIso(this.opts.timezone), text: this.stamp() + text, ...extra }, { trigger });
       const item = chatItem(e);
@@ -1356,6 +1366,34 @@ export class DesktopPetWorld implements World {
       this.log?.warn(`对话记录没能保存:${(err as Error).message}`);
       return null;
     }
+  }
+
+  /* ---------- idle chat: the pet starts a little chat itself ---------- */
+
+  /** Sets the clock again: the next self-started line may go after the configured quiet minutes, with some randomness on top. */
+  private idleChatArm(): void {
+    const minutes = Math.max(0, this.cfg.idleChat.minutes);
+    this.idleChatDueAt = Date.now() + minutes * 60_000 * (minutes > 0 ? 1 + Math.random() * 0.5 : 0);
+  }
+
+  /** Whether `now` sits in the quiet window; the times are local (`shortTime`), and the window may cross midnight. */
+  private idleChatQuiet(now: number): boolean {
+    const minute = clockMinutes(shortTime(this.opts.timezone, new Date(now)));
+    return minute !== null && inClockWindow(this.cfg.idleChat.quietFrom, this.cfg.idleChat.quietTo, minute);
+  }
+
+  /**
+   * The idle-chat beat: after the quiet stretch the pet finds its own topic and says a line or two. While a line is
+   * on screen, the pet window is gone, or the quiet window holds, it waits — those end, so the next beat tries again.
+   */
+  private idleChatTick(): void {
+    if (!this.cfg.idleChat.enabled) return;
+    const now = Date.now();
+    if (now < this.idleChatDueAt) return;
+    if (now < this.busyUntil || !this.server.petConnected || this.idleChatQuiet(now)) return;
+    this.idleChatArm();
+    const minutes = Math.max(0, this.cfg.idleChat.minutes);
+    void this.push('desktop-pet.idle', 'desktop-pet.idle', this.t.idleChat(minutes), 'debounce', { meta: { idle: { minutes } } });
   }
 
   /* ---------- voice ---------- */
@@ -1756,6 +1794,7 @@ export class DesktopPetWorld implements World {
     if (spoken && !this.server.sendPet({ t: 'say', id: nextId('s'), beats })) return this.notConnected('pet_say');
     void this.closeActivity();
     void this.record({ kind: 'say', beats: beats.map((b) => ({ text: b.text, ...moodOf(b.actions, this.vocab()) })) }, beats.map((b) => b.text).join(''), shown.blobs);
+    this.idleChatArm(); // a line it says itself also opens the next quiet stretch
     if (!spoken) return { text: this.t.imagesShown(shown.blobs.length, this.chat.size > 0) };
     const now = Date.now();
     const selfSec = estimateSeconds(beats, this.cfg.window.bubbleSpeed, this.cfg.speech.enabled ? speechTextSteps : undefined);

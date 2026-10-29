@@ -273,6 +273,11 @@ const en: PetText = {
     port: { title: 'Page port', description: 'Moves up to the next free port when taken.' },
     touchEnabled: { title: 'Touches become events', description: 'Pokes, petting, and being picked up and thrown.' },
     touchWakeOn: { title: 'Response mode', description: 'poke: only a poke gets a response right away; other touches wait for the next response. all: every touch gets one. none: every touch waits for the next response. custom: the touches ticked on the Habits page get one. After a touch gets a response, the touches until that turn ends wait for the next one.' },
+    idleChatEnabled: { title: 'Start a chat itself', description: 'After a quiet stretch Coo picks its own topic and says a line or two — asking for a pet, talking about the dream it had last night, sharing a little anecdote of its own.' },
+    idleChatMinutes: { title: 'Quiet minutes before it speaks', description: 'After roughly this many minutes without interaction it may speak up, with some randomness so it does not feel like a timer.', suffix: 'min' },
+    idleChatQuietFrom: { title: 'Do not disturb from', description: 'During this window it will not speak on its own; a range may cross midnight.' },
+    idleChatQuietTo: { title: 'Do not disturb to', description: 'The same time as the start means no window.' },
+    idleChatQuiet: { description: 'During this window it will not speak on its own; a range may cross midnight, and start = end means no window.' },
     sound: { title: 'All sounds', description: "The sound button in the pet's menu flips this." },
     sounds: {
       move: { title: 'Moving', description: 'Walking, running, jumping, landing, being thrown, nodding, shaking, spinning, dizziness, shivering, dancing, looking about.' },

@@ -82,6 +82,10 @@ const KEYS = {
   saidBubbles: `${K}.saidBubbles`,
   wakeOn: `${K}.touch.wakeOn`,
   selfAdjust: `${K}.selfAdjust`,
+  idleChat: `${K}.idleChat.enabled`,
+  idleMinutes: `${K}.idleChat.minutes`,
+  quietFrom: `${K}.idleChat.quietFrom`,
+  quietTo: `${K}.idleChat.quietTo`,
 } as const;
 
 /** `touch.wakeOn` in the row's order, and the touches 「自定义…」 picks from (the World's TOUCH_KINDS). */
@@ -204,6 +208,24 @@ async function mount(ctx: PageContext): Promise<void> {
   const dblclick = ui.checkbox(S.dblclick, { onChange: (on) => void save(KEYS.dblclick, on, GROUP, behaviorMsg) });
   const statusBubble = ui.checkbox(S.statusBubble, { onChange: (on) => void save(KEYS.statusBubble, on, GROUP, behaviorMsg) });
   const saidBubbles = ui.checkbox(S.saidBubble, { onChange: (on) => void save(KEYS.saidBubbles, on, GROUP, behaviorMsg) });
+  // 主动找你聊天: the switch, the quiet minutes before it may speak, and the do-not-disturb window
+  const idleChat = ui.checkbox(S.idleChat, { onChange: (on) => { void save(KEYS.idleChat, on, GROUP, behaviorMsg); renderIdle(); } });
+  const idleMinutes = ui.input({ type: 'number' });
+  idleMinutes.min = '1'; idleMinutes.max = '720'; idleMinutes.step = '1';
+  const idleMinutesBox = ui.h('div', 'companion-rangebox');
+  idleMinutesBox.append(idleMinutes, ui.h('span', 'companion-rangeval', S.idleMinutesUnit));
+  const quietFrom = ui.h('input', 'field');
+  quietFrom.type = 'time';
+  const quietTo = ui.h('input', 'field');
+  quietTo.type = 'time';
+  const quietBox = ui.h('div', 'companion-rangebox');
+  quietBox.append(ui.h('span', 'companion-rangeval', S.quietFromLabel), quietFrom, ui.h('span', 'companion-rangeval', S.quietToLabel), quietTo);
+  // the minutes and the window only matter while the pet may speak at all
+  const renderIdle = () => {
+    const on = idleChat.checked;
+    idleMinutes.disabled = !on;
+    quietFrom.disabled = quietTo.disabled = !on;
+  };
   // the two rows below follow the pet panel's state; 「自定义…」 is picked by saving its popup
   let habit: Habits = { wake: { wakeOn: 'poke', wakeKinds: ['poke'] }, selfAdjust: { mode: 'default', custom: {} } };
   const wakeHint = ui.h('p', 'home-note');
@@ -400,6 +422,9 @@ async function mount(ctx: PageContext): Promise<void> {
     row(S.typeKeyLabel, typeBox, typeHint),
     row(S.statusBubbleLabel, statusBubble.el, S.statusBubbleHint),
     row(S.saidBubbleLabel, saidBubbles.el, S.saidBubbleHint),
+    row(S.idleChatLabel, idleChat.el, S.idleChatHint),
+    row(S.idleMinutes, idleMinutesBox, S.idleMinutesHint),
+    row(S.quietLabel, quietBox, S.quietHint),
     behaviorMsg,
   );
   const display = ui.sheet({ title: S.groupDisplay });
@@ -590,6 +615,19 @@ async function mount(ctx: PageContext): Promise<void> {
     if (snore.value !== snore.dataset.saved) { snore.dataset.saved = snore.value; void save(KEYS.snoreSeconds, n, SOUND_GROUP, soundMsg); }
   });
   snore.addEventListener('keydown', (e) => { if (e.key === 'Enter') snore.blur(); });
+  idleMinutes.addEventListener('change', () => {
+    const n = Math.round(Number(idleMinutes.value));
+    if (idleMinutes.value === '' || !Number.isFinite(n) || n < 1 || n > 720) { idleMinutes.value = idleMinutes.dataset.saved ?? '45'; return; }
+    idleMinutes.value = String(n);
+    if (idleMinutes.value !== idleMinutes.dataset.saved) { idleMinutes.dataset.saved = idleMinutes.value; void save(KEYS.idleMinutes, n, GROUP, behaviorMsg); }
+  });
+  idleMinutes.addEventListener('keydown', (e) => { if (e.key === 'Enter') idleMinutes.blur(); });
+  const saveQuiet = (el: HTMLInputElement, key: string) => {
+    if (!/^\d{1,2}:\d{2}$/.test(el.value)) { el.value = el.dataset.saved ?? ''; return; }
+    if (el.value !== el.dataset.saved) { el.dataset.saved = el.value; void save(key, el.value, GROUP, behaviorMsg); }
+  };
+  quietFrom.addEventListener('change', () => saveQuiet(quietFrom, KEYS.quietFrom));
+  quietTo.addEventListener('change', () => saveQuiet(quietTo, KEYS.quietTo));
 
   const refreshValues = async () => {
     // with the OBS overlay page while it is exported
@@ -649,6 +687,14 @@ async function mount(ctx: PageContext): Promise<void> {
     if (typeof values[KEYS.dblclick] === 'boolean') dblclick.setChecked(values[KEYS.dblclick] as boolean);
     if (typeof values[KEYS.statusBubble] === 'boolean') statusBubble.setChecked(values[KEYS.statusBubble] as boolean);
     if (typeof values[KEYS.saidBubbles] === 'boolean') saidBubbles.setChecked(values[KEYS.saidBubbles] as boolean);
+    if (typeof values[KEYS.idleChat] === 'boolean') idleChat.setChecked(values[KEYS.idleChat] as boolean);
+    if (typeof values[KEYS.idleMinutes] === 'number' && active !== idleMinutes) {
+      idleMinutes.value = String(values[KEYS.idleMinutes]);
+      idleMinutes.dataset.saved = idleMinutes.value;
+    }
+    if (typeof values[KEYS.quietFrom] === 'string' && active !== quietFrom) { quietFrom.value = values[KEYS.quietFrom] as string; quietFrom.dataset.saved = quietFrom.value; }
+    if (typeof values[KEYS.quietTo] === 'string' && active !== quietTo) { quietTo.value = values[KEYS.quietTo] as string; quietTo.dataset.saved = quietTo.value; }
+    renderIdle();
     if (typeof values[KEYS.overlay] === 'boolean') overlay.setChecked(values[KEYS.overlay] as boolean);
     // a popup open over the page keeps the rows as they are until it is saved or closed
     const state = await habitState;

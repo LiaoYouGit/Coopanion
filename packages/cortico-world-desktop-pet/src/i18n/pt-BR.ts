@@ -243,6 +243,11 @@ const ptBR: Translation<PetText> = {
     port: { title: 'Porta da página', description: 'Se estiver ocupada, passa para a próxima porta livre.' },
     touchEnabled: { title: 'Toques viram eventos', description: 'Cutucadas, carinho, e pegar e arremessar o pet.' },
     touchWakeOn: { title: 'Modo de resposta', description: 'poke: só um cutucão recebe resposta na hora; os outros toques esperam a próxima resposta. all: todo toque recebe resposta na hora. none: todo toque espera a próxima resposta. custom: os toques marcados na página Hábitos recebem resposta na hora. Depois de uma resposta, os toques até o fim desse turno esperam a próxima.' },
+    idleChatEnabled: { title: 'Falar por conta própria', description: 'Depois de um tempo sem interação, o Coo encontra um assunto próprio e solta uma ou duas frases: pedir carinho, contar o sonho da noite, compartilhar uma historinha sua.' },
+    idleChatMinutes: { title: 'Silêncio antes de falar', description: 'Depois de mais ou menos esse tempo sem interação ele pode falar, com um pouco de aleatoriedade: não é um cronômetro.', suffix: 'min' },
+    idleChatQuietFrom: { title: 'Não perturbar de', description: 'Nesse horário ele não fala por conta própria; a faixa pode virar a meia-noite.' },
+    idleChatQuietTo: { title: 'Não perturbar até', description: 'A mesma hora do início significa sem faixa.' },
+    idleChatQuiet: { description: 'Nesse horário ele não fala por conta própria; a faixa pode virar a meia-noite, e início = fim significa sem faixa.' },
     sound: { title: 'Todos os sons', description: 'O botão de som no menu do pet alterna isto.' },
     sounds: {
       move: { title: 'Movimentos', description: 'Andar, correr, pular, aterrissar, arremesso, acenar com a cabeça, balançar a cabeça, girar, tontura, tremer, dançar, olhar em volta.' },

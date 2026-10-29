@@ -243,6 +243,11 @@ const ko: Translation<PetText> = {
     port: { title: '페이지 포트', description: '사용 중이면 다음 빈 포트로 올라갑니다.' },
     touchEnabled: { title: '터치를 이벤트로 전달', description: '찌르기, 쓰다듬기, 들어 올려 던지기.' },
     touchWakeOn: { title: '반응 모드', description: 'poke: 찌를 때만 바로 반응하고, 나머지 터치는 다음 반응 때 함께 전달됩니다. all: 모든 터치에 바로 반응합니다. none: 모든 터치가 다음 반응 때 함께 전달됩니다. custom: 「습관」 페이지에서 체크한 터치에 바로 반응합니다. 한 번 반응한 뒤 그 차례가 끝날 때까지의 터치는 다음 반응 때 함께 전달됩니다.' },
+    idleChatEnabled: { title: '먼저 말 걸기', description: '한동안 소통이 없으면 Coo가 스스로 화제를 찾아 한마디씩 말을 겁니다. 쓰다듬어 달라기, 어젯밤 꿈 이야기, 자기 일화 공유 같은 것들이요.' },
+    idleChatMinutes: { title: '조용한 시간 후 말 걸기', description: '마지막 소통에서 이만큼 지나면 말을 걸 수 있습니다. 매번 조금씩 달라서 타이머처럼 정확하지는 않습니다.', suffix: '분' },
+    idleChatQuietFrom: { title: '방해 금지 시작', description: '이 시간에는 먼저 말을 걸지 않습니다. 자정을 넘기는 설정도 됩니다.' },
+    idleChatQuietTo: { title: '방해 금지 종료', description: '「방해 금지 시작」과 같은 시간을 넣으면 방해 금지가 없습니다.' },
+    idleChatQuiet: { description: '이 시간에는 먼저 말을 걸지 않습니다. 자정을 넘기는 설정도 되고, 시작과 같은 시간이면 방해 금지가 없습니다.' },
     sound: { title: '모든 효과음', description: '펫 메뉴의 효과음 버튼이 이 설정을 켜고 끕니다.' },
     sounds: {
       move: { title: '움직임', description: '걷기, 달리기, 점프, 착지, 던져지기, 끄덕이기, 고개 젓기, 회전, 어지러움, 떨기, 춤, 두리번거리기.' },

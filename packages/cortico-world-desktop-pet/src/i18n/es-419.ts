@@ -243,6 +243,11 @@ const es419: Translation<PetText> = {
     port: { title: 'Puerto de la página', description: 'Si está ocupado, pasa al siguiente puerto libre.' },
     touchEnabled: { title: 'Los toques se vuelven eventos', description: 'Toquecitos, caricias, levantadas y lanzamientos.' },
     touchWakeOn: { title: 'Modo de respuesta', description: 'poke: solo un toque recibe respuesta enseguida; los demás toques esperan a la siguiente respuesta. all: todos los toques reciben respuesta. none: todos los toques esperan a la siguiente respuesta. custom: reciben respuesta los toques marcados en la página Hábitos. Tras una respuesta, los toques hasta el final de ese turno esperan a la siguiente.' },
+    idleChatEnabled: { title: 'Que hable primero', description: 'Tras un rato sin interacción, Coo busca su propio tema y suelta un par de frases: pedir una caricia, contar el sueño de anoche, compartir alguna anécdota suya.' },
+    idleChatMinutes: { title: 'Silencio antes de hablar', description: 'Después de más o menos este tiempo sin interacción puede tomar la palabra, con algo de azar: no es un temporizador.', suffix: 'min' },
+    idleChatQuietFrom: { title: 'No molestar desde', description: 'En este horario no habla por su cuenta; el rango puede cruzar la medianoche.' },
+    idleChatQuietTo: { title: 'No molestar hasta', description: 'La misma hora que el inicio significa que no hay horario.' },
+    idleChatQuiet: { description: 'En este horario no habla por su cuenta; el rango puede cruzar la medianoche, e inicio = fin significa que no hay horario.' },
     sound: { title: 'Todos los sonidos', description: 'El botón de sonido del menú de la mascota cambia esto.' },
     sounds: {
       move: { title: 'Movimientos', description: 'Caminar, correr, saltar, aterrizar, salir volando, asentir, negar con la cabeza, girar, marearse, temblar, bailar, mirar alrededor.' },

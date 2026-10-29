@@ -243,6 +243,11 @@ const it: Translation<PetText> = {
     port: { title: 'Porta della pagina', description: 'Passa alla porta libera successiva se è occupata.' },
     touchEnabled: { title: 'I tocchi diventano eventi', description: 'Colpetti, carezze, sollevamenti e lanci.' },
     touchWakeOn: { title: 'Modalità di risposta', description: 'poke: solo un colpetto riceve subito una risposta; gli altri tocchi attendono la risposta successiva. all: ogni tocco ne riceve una. none: ogni tocco attende la risposta successiva. custom: ricevono una risposta i tocchi spuntati nella pagina Abitudini. Dopo una risposta, i tocchi fino alla fine di quel turno attendono la successiva.' },
+    idleChatEnabled: { title: 'Parlare per conto suo', description: 'Dopo un po’ senza interazioni, Coo trova un argomento suo e dice una o due frasi — chiedere una coccola, raccontare il sogno della notte, condividere una piccola esperienza sua.' },
+    idleChatMinutes: { title: 'Silenzio prima di parlare', description: 'Dopo più o meno tanti minuti senza interazioni può prendere la parola, con un po’ di casualità: non è un timer.', suffix: 'min' },
+    idleChatQuietFrom: { title: 'Non disturbare dalle', description: 'In questo periodo non parla di suo; la fascia può attraversare la mezzanotte.' },
+    idleChatQuietTo: { title: 'Non disturbare alle', description: 'La stessa ora dell’inizio significa nessuna fascia.' },
+    idleChatQuiet: { description: 'In questo periodo non parla di suo; la fascia può attraversare la mezzanotte, e inizio = fine significa nessuna fascia.' },
     sound: { title: 'Tutti i suoni', description: "Il pulsante dei suoni nel menu dell'animaletto attiva e disattiva questa opzione." },
     sounds: {
       move: { title: 'Movimento', description: 'Camminare, correre, saltare, atterrare, volare dopo un lancio, annuire, scuotere la testa, fare piroette, capogiro, brividi, ballare, guardarsi intorno.' },

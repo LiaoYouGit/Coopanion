@@ -243,6 +243,11 @@ const ja: Translation<PetText> = {
     port: { title: 'ページのポート', description: '使用中のときは次の空きポートに繰り上げます。' },
     touchEnabled: { title: 'ふれあいをイベントにする', description: 'つつく、なでる、持ち上げて投げる。' },
     touchWakeOn: { title: '反応モード', description: 'poke：つついたときだけすぐに反応し、ほかのふれあいは次の反応時にまとめて届きます。all：すべてのふれあいにすぐ反応します。none：すべてのふれあいは次の反応時にまとめて届きます。custom：「ふるまい」ページでチェックしたふれあいにすぐ反応します。一度反応したあと、そのターンが終わるまでのふれあいは次の反応時にまとめて届きます。' },
+    idleChatEnabled: { title: '自分から話しかける', description: 'しばらくやり取りがないとき、Coo が自分で話題を見つけてひとこと・ふたこと話しかけます。なでてほしい、昨晩の夢の話、身近な小ネタの共有など。' },
+    idleChatMinutes: { title: '静かにしてから話すまで', description: '前回のやり取りからこの時間が経つと話しかけてくる可能性があります。毎回多少のばらつきがあり、タイマーのようには正確ではありません。', suffix: '分' },
+    idleChatQuietFrom: { title: 'おやすみ開始', description: 'この時間帯は自分から話しかけません。日付をまたぐ設定もできます。' },
+    idleChatQuietTo: { title: 'おやすみ終了', description: '「おやすみ開始」と同じ時刻にすると、おやすみ時間はなしになります。' },
+    idleChatQuiet: { description: 'この時間帯は自分から話しかけません。日付をまたぐ設定もでき、「おやすみ開始」と同じ時刻ならなしになります。' },
     sound: { title: 'すべてのサウンド', description: 'ペットのメニューのサウンドボタンでこれを切り替えます。' },
     sounds: {
       move: { title: '動き', description: '歩く、走る、跳ぶ、着地、投げられる、うなずく、首を振る、回る、目を回す、震える、踊る、見回す。' },

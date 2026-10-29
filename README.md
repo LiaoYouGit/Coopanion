@@ -42,7 +42,7 @@ Coopanion is a desktop pet. **Coo** lives on the bottom edge of your screen: it 
 ## Features
 
 - **Many model services**: OpenAI, Anthropic, Gemini, xAI, OpenRouter, DeepSeek, Kimi, Qwen, MiniMax, Zhipu GLM, Doubao, Baidu Qianfan and StepFun with an API key, or a ChatGPT account through its ChatGPT plan.
-- **Chat**: hold the talk key and speak, or type; Coo answers in a bubble. Speech is recognized on your machine with FunASR or Whisper.
+- **Chat**: hold the talk key and speak, or type; Coo answers in a bubble. Speech is recognized on your machine with FunASR or Whisper. After a quiet stretch Coo picks a topic of its own and says a line or two; it stays silent during the do-not-disturb window (22:00–08:00 by default, set under Pet → Behavior).
 - **Memory**: Coo remembers what you talked about and when you poke it or pat its head. What it knows about you goes in `PARTNER.md` in its workspace, and every change to the workspace is kept as a version (the Windows build carries git; on macOS and Linux git has to be installed).
 - **Computer use**: clicking buttons, typing, switching windows. Coo asks before it acts.
 - **Activity bubbles**: an animated icon shows when Coo is thinking, reading, searching, writing or using the computer.

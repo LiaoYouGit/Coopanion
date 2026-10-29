@@ -109,6 +109,8 @@ const zh = {
 
   /** `pet_say` with images and an empty script. */
   imagesShown: (n: number, chatOpen: boolean) => `${n} 张图片已显示在对话页${chatOpen ? '' : ',对话页现在没有打开'}。`,
+  /** 主动找对方说话的事件。 */
+  idleChat: (minutes: number) => `已经 ${minutes} 分钟没有互动了。可以主动找个话题说一两句(pet_say),比如求对方摸摸你、聊聊昨晚做的梦、分享自己碰到的小趣事;刚说过的别重复,对方不想聊就安静待着。`,
   /** fallbackText of an image `pet_say` showed; that event is stored, never delivered. */
   shownImage: (i: number, total: number) => `[对话页上展示的图片 ${i}/${total}]`,
   imagesNotHandles: '[pet_say 没执行] images 要填附件句柄组成的数组。',
@@ -235,6 +237,8 @@ const en: typeof zh = {
     + (r.dropped.length ? `\n[arguments] These markers are not in the current figure's vocabulary and were skipped: ${r.dropped.join(', ')}.` : ''),
 
   imagesShown: (n, chatOpen) => `${n} image${n > 1 ? 's' : ''} shown on the chat page${chatOpen ? '' : ', which is not open right now'}.`,
+  /** The internal event that asks the pet to start a little chat itself. */
+  idleChat: (minutes) => `No interaction for ${minutes} minutes. You could start a little chat yourself (pet_say) — ask the person to pet you, talk about the dream you had last night, share a little anecdote of your own; do not repeat what you just said, and if the person is not in the mood, stay quiet.`,
   shownImage: (i, total) => `[image ${i}/${total} shown on the chat page]`,
   imagesNotHandles: '[pet_say not run] images takes an array of attachment handles.',
   tooManyImages: (max) => `[pet_say not run] images takes at most ${max} handles.`,

@@ -243,6 +243,11 @@ const zhHant: Translation<PetText> = {
     port: { title: '頁面連接埠', description: '被佔用時往上順延到下一個空的連接埠。' },
     touchEnabled: { title: '互動送成事件', description: '戳、摸、拎起來甩出去。' },
     touchWakeOn: { title: '回應模式', description: 'poke：只有戳一下馬上回應，其餘互動等下次回應時一併送達；all：所有互動都馬上回應；none：所有互動都等下次回應時一併送達；custom：依「習慣」頁勾選的互動馬上回應。一次互動得到回應之後、本輪結束之前的互動，都等下次回應時一併送達。' },
+    idleChatEnabled: { title: '主動找你聊天', description: '一段時間沒互動時，Coo 自己找個話題主動說一兩句，比如求摸摸、聊聊昨晚做的夢、分享自己碰到的小趣事。' },
+    idleChatMinutes: { title: '安靜多久後開口', description: '距上一次互動這麼久就可能開口，每次會有些隨機，不像定時器。', suffix: '分鐘' },
+    idleChatQuietFrom: { title: '免打擾從', description: '這段時間裡不主動開口，跨零點的時段也行。' },
+    idleChatQuietTo: { title: '免打擾到', description: '和「免打擾從」填一樣就是不設免打擾。' },
+    idleChatQuiet: { description: '這段時間裡不主動開口，跨零點的時段也行；和「免打擾從」填一樣就是不設免打擾。' },
     sound: { title: '音效總開關', description: '桌寵選單裡的音效按鈕切換的就是這個。' },
     sounds: {
       move: { title: '動作', description: '走路、跑、跳、落地、被甩出去、點頭、搖頭、轉圈、頭暈、發抖、跳舞、張望。' },

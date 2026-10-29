@@ -243,6 +243,11 @@ const fr: Translation<PetText> = {
     port: { title: 'Port de la page', description: "Passe au port libre suivant s'il est occupé." },
     touchEnabled: { title: 'Les contacts deviennent des événements', description: 'Petits coups, caresses, se faire soulever et lancer.' },
     touchWakeOn: { title: 'Mode de réponse', description: 'poke : seul un petit coup obtient une réponse immédiate ; les autres contacts attendent la prochaine réponse. all : chaque contact obtient une réponse immédiate. none : chaque contact attend la prochaine réponse. custom : les contacts cochés sur la page Habitudes obtiennent une réponse immédiate. Après une réponse, les contacts jusqu’à la fin de ce tour attendent la suivante.' },
+    idleChatEnabled: { title: 'Engager la conversation lui-même', description: 'Après un moment sans interaction, Coo trouve son propre sujet et lance une réplique ou deux — demander une caresse, raconter son rêve de la nuit, partager une petite anecdote.' },
+    idleChatMinutes: { title: 'Silence avant de parler', description: 'Après environ ce temps sans interaction, il peut prendre la parole, avec un peu d’aléa — ce n’est pas un minuteur.', suffix: 'min' },
+    idleChatQuietFrom: { title: 'Ne pas déranger — début', description: 'Pendant cette période il ne prend pas la parole de lui-même ; la plage peut passer minuit.' },
+    idleChatQuietTo: { title: 'Ne pas déranger — fin', description: 'La même heure que le début signifie pas de période.' },
+    idleChatQuiet: { description: 'Pendant cette période il ne prend pas la parole de lui-même ; la plage peut passer minuit, et début = fin signifie pas de période.' },
     sound: { title: 'Tous les sons', description: 'Le bouton son du menu du compagnon bascule ce réglage.' },
     sounds: {
       move: { title: 'Mouvements', description: 'Marcher, courir, sauter, atterrir, se faire lancer, hocher la tête, la secouer, tourner, vertige, frissons, danser, regarder autour.' },

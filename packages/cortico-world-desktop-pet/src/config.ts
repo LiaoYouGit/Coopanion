@@ -101,6 +101,21 @@ export function touchWakes(touch: { wakeOn: TouchWake; wakeKinds?: readonly stri
   return touch.wakeOn === 'custom' && Array.isArray(touch.wakeKinds) && touch.wakeKinds.includes(kind);
 }
 
+/** `HH:MM` as minutes of the day, or null when it is not a clock time. */
+export function clockMinutes(value: string): number | null {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(value.trim());
+  if (!m) return null;
+  const h = Number(m[1]), minute = Number(m[2]);
+  return h <= 23 && minute <= 59 ? h * 60 + minute : null;
+}
+
+/** Whether `minute` is in the `from`–`to` window; a range may cross midnight, equal ends mean no window. */
+export function inClockWindow(from: string, to: string, minute: number): boolean {
+  const a = clockMinutes(from), b = clockMinutes(to);
+  if (a === null || b === null || a === b) return false;
+  return a < b ? minute >= a && minute < b : minute >= a || minute < b;
+}
+
 /**
  * What `pet_set` and `pet_quiet` may do: off = nothing; default = the items of SELF_DEFAULT that are true at once, the
  * rest once the person agrees; any = every item at once; custom = per item, as `selfAdjustCustom` says.
@@ -223,6 +238,16 @@ export interface DesktopPetConfigSection extends WorldSection {
     /** Under `custom`: the touches that wake the bot. */
     wakeKinds: TouchKind[];
   };
+  /** The pet starting a little chat by itself after a quiet stretch. */
+  idleChat: {
+    /** Off: the pet only speaks when spoken to. */
+    enabled: boolean;
+    /** Idle minutes before it may start, with some randomness on top. */
+    minutes: number;
+    /** Local HH:MM the quiet window runs from; equal to `quietTo` means no window. */
+    quietFrom: string;
+    quietTo: string;
+  };
   asr: {
     enabled: boolean;
     /** Empty: by the app language (`asrEngineFor`). Earlier versions wrote `auto` here, which reads as empty. */
@@ -287,6 +312,7 @@ export const DESKTOP_PET_DEFAULTS: DesktopPetConfigSection = {
   },
   cua: CUA_DEFAULTS,
   touch: { enabled: true, wakeOn: 'poke', wakeKinds: ['poke'] },
+  idleChat: { enabled: true, minutes: 45, quietFrom: '22:00', quietTo: '08:00' },
   asr: {
     enabled: true,
     engine: '',
@@ -339,6 +365,10 @@ export function desktopPetConfigGroups(language: Language = 'zh'): ConfigGroup[]
         [`${K}.port`]: { type: 'integer', title: c.port.title, minimum: 1024, maximum: 65535, description: c.port.description, 'x-hot': false },
         [`${K}.touch.enabled`]: { type: 'boolean', title: c.touchEnabled.title, description: c.touchEnabled.description, 'x-hot': true },
         [`${K}.touch.wakeOn`]: { type: 'string', title: c.touchWakeOn.title, enum: ['none', 'poke', 'all', 'custom'], description: c.touchWakeOn.description, 'x-hot': true },
+        [`${K}.idleChat.enabled`]: { type: 'boolean', title: c.idleChatEnabled.title, description: c.idleChatEnabled.description, 'x-hot': true },
+        [`${K}.idleChat.minutes`]: { type: 'integer', title: c.idleChatMinutes.title, description: c.idleChatMinutes.description, minimum: 1, maximum: 720, 'x-suffix': c.idleChatMinutes.suffix, 'x-hot': true },
+        [`${K}.idleChat.quietFrom`]: { type: 'string', title: c.idleChatQuietFrom.title, description: c.idleChatQuiet.description, 'x-hot': true },
+        [`${K}.idleChat.quietTo`]: { type: 'string', title: c.idleChatQuietTo.title, description: c.idleChatQuiet.description, 'x-hot': true },
       },
     },
   };

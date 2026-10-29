@@ -243,6 +243,11 @@ const de: Translation<PetText> = {
     port: { title: 'Seiten-Port', description: 'Weicht auf den nächsten freien Port aus, wenn er belegt ist.' },
     touchEnabled: { title: 'Berührungen werden zu Ereignissen', description: 'Anstupsen, Streicheln, Hochheben und Werfen.' },
     touchWakeOn: { title: 'Reaktionsmodus', description: 'poke: Nur Anstupsen bekommt sofort eine Reaktion; andere Berührungen warten auf die nächste. all: Jede Berührung bekommt sofort eine. none: Jede Berührung wartet auf die nächste Reaktion. custom: Die auf der Seite „Gewohnheiten“ angehakten Berührungen bekommen sofort eine. Nach einer Reaktion warten die Berührungen bis zum Ende dieser Runde auf die nächste.' },
+    idleChatEnabled: { title: 'Von selbst ansprechen', description: 'Nach einer Weile ohne Interaktion sucht sich Coo ein eigenes Thema und sagt ein, zwei Sätze — eine Streicheleinheit erbitten, vom Traum in der Nacht erzählen, eine kleine eigene Anekdote teilen.' },
+    idleChatMinutes: { title: 'Stille bis zur Ansprache', description: 'Nach ungefähr so vielen Minuten ohne Interaktion kann es sich melden, mit etwas Zufall — kein Timer.', suffix: 'Min.' },
+    idleChatQuietFrom: { title: 'Ruhezeit von', description: 'In diesem Zeitraum spricht es von sich aus nicht; der Bereich darf über Mitternacht gehen.' },
+    idleChatQuietTo: { title: 'Ruhezeit bis', description: 'Dieselbe Uhrzeit wie bei „Ruhezeit von“ bedeutet keine Ruhezeit.' },
+    idleChatQuiet: { description: 'In diesem Zeitraum spricht es von sich aus nicht; der Bereich darf über Mitternacht gehen, und von = bis bedeutet keine Ruhezeit.' },
     sound: { title: 'Alle Töne', description: 'Die Ton-Schaltfläche im Menü des Haustiers schaltet das um.' },
     sounds: {
       move: { title: 'Bewegung', description: 'Gehen, Rennen, Springen, Landen, Geworfenwerden, Nicken, Kopfschütteln, Drehen, Schwindel, Zittern, Tanzen, Umherschauen.' },
