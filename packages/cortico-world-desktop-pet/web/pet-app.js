@@ -260,7 +260,7 @@ function applyPrefs(p) {
   if (p.skin) { if (worn) worn = normalizeSkin(p.skin); else putOn(normalizeSkin(p.skin)); }
   if (p.roam) { prefs.roam = p.roam; body?.set({ roam: p.roam }); }
   if (typeof p.sound === 'boolean') { prefs.sound = p.sound; sfx.set(p.sound); }
-  if (p.sounds && typeof p.sounds === 'object') sfx.configure({ kinds: p.sounds, snoreSeconds: p.sounds.snoreSeconds });
+  if (p.sounds && typeof p.sounds === 'object') sfx.configure({ kinds: p.sounds, snoreSeconds: p.sounds.snoreSeconds, panByPosition: p.sounds.panByPosition });
   if (p.speech && typeof p.speech === 'object') speech.configure(p.speech);
   if (p.theme === 'dark' || p.theme === 'light') { prefs.theme = p.theme; applyTheme(p.theme); modeBtn?.show(p.theme); body?.set({ theme: p.theme }); }
   if (typeof p.glow === 'number') prefs.glow = p.glow;
@@ -453,17 +453,16 @@ function startItem(it) {
 }
 
 /**
- * The pointer is on Coo's bubble: a line's countdown stands still meanwhile, so it can be read to the end or its
- * link clicked. Decided from the cursor reports, not from `:hover`: on Windows a click-through window gets no
- * mouse moves, so a hover that was on when the window went through never clears and the line would never let go.
+ * The cursor is on Coo's bubble: a line's countdown stands still meanwhile, so it can be read to the end or its link
+ * clicked. Decided from where the cursor is now, as stepTools does: `:hover` stays with the last mouse event, and a
+ * click-through window stops getting them once the cursor has left.
  */
-const pointedAt = () => {
-  if (bubble.hidden) return false;
+function pointedAt() {
   const p = cursor.at;
-  if (!p) return false;
+  if (bubble.hidden || !p) return false;
   const r = bubble.getBoundingClientRect();
-  return p.x >= r.left - 4 && p.x <= r.right + 4 && p.y >= r.top - 4 && p.y <= r.bottom + 4;
-};
+  return p.x >= r.left && p.x <= r.right && p.y >= r.top && p.y <= r.bottom;
+}
 
 function stepDialog(dt) {
   if (!item && queue.length && at() && !at().busy) startItem(queue.shift());
