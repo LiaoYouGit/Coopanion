@@ -41,8 +41,8 @@ Coopanion 是一个桌宠。桌宠 **Coo** 待在屏幕底边，可以用气泡�
 
 ## 功能
 
-- **多家模型**：DeepSeek、通义千问、Kimi、智谱 GLM、豆包、MiniMax、阶跃星辰、百度千帆、OpenRouter、OpenAI、Anthropic、Gemini、xAI。选一家，贴上 API Key 就能用；也可以登录 ChatGPT 账号，使用它的 ChatGPT 套餐。
-- **聊天**：按说话键说话，或者打字，Coo 在气泡里回复。语音在本机用 FunASR 或 Whisper 识别。一段时间没互动，它也会自己挑个话题说一两句；免打扰时段（默认 22:00–08:00，可在「桌宠 → 行为」修改）里不开口。
+- **多家模型**：DeepSeek、通义千问、Kimi、智谱 GLM、豆包、MiniMax、阶跃星辰、百度千帆、OpenRouter、OpenAI、Anthropic、Gemini、xAI。选一家，贴上 API Key 就能用；也可以登录 ChatGPT 账号，使用它的 ChatGPT 套餐；还可以填 newAPI 网关的地址，用它背后的模型。
+- **聊天**：按说话键说话，或者打字，Coo 在气泡里回复。语音在本机用 FunASR 或 Whisper 识别。
 - **记忆**：记得聊过的内容，也知道你戳了它、摸了它的头。它对你的了解写在工作区的 `PARTNER.md`，工作区每次改动都记成一个版本（Windows 版自带 git，macOS 和 Linux 要系统里装有 git）。
 - **操作电脑**：点按钮、打字、切窗口。动手前先问你。
 - **状态气泡**：想事情、看文件、搜索、写入、操作电脑时，头顶用小图标和动画显示在做什么。
@@ -119,8 +119,9 @@ Coopanion 是一个桌宠。桌宠 **Coo** 待在屏幕底边，可以用气泡�
 | Anthropic              | [platform.claude.com](https://platform.claude.com/settings/keys)                                                                                                                 | `claude-haiku-5-5`                                                         |
 | Gemini（Google AI Studio） | [aistudio.google.com](https://aistudio.google.com/apikey)                                                                                                                    | `gemini-3.5-flash-lite`                                                    |
 | xAI                    | [console.x.ai](https://console.x.ai/team/default/api-keys)                                                                                                                       | `grok-4.3`                                                                 |
+| newAPI 网关            | 你自己的部署（[github.com/QuantumNous/new-api](https://github.com/QuantumNous/new-api)），Key 在网关自己的控制台创建                                                              | 网关提供的任意模型                                                          |
 
-默认模型是每家快、便宜且能看图的一档；要换别的，在「开始」页的「模型」框里改模型名。通义千问、Kimi、智谱 GLM、MiniMax 各有国内和国际两个平台，账号和 Key 不通用，可以在「开始」页切换。豆包、百度千帆、阶跃星辰、阶跃 Step Plan 只收中国大陆账号。拿真实 Key 测过的只有 DeepSeek、Anthropic 和阶跃 Step Plan，其他几家连不上请开 issue。
+默认模型是每家快、便宜且能看图的一档；要换别的，在「开始」页的「模型」框里改模型名。通义千问、Kimi、智谱 GLM、MiniMax 各有国内和国际两个平台，账号和 Key 不通用，可以在「开始」页切换。豆包、百度千帆、阶跃星辰、阶跃 Step Plan 只收中国大陆账号。newAPI 网关在服务一行的最后：选它，填你的网关地址（`https://…/v1`）和它提供的模型名，Key 在网关自己的控制台创建。拿真实 Key 测过的只有 DeepSeek、Anthropic 和阶跃 Step Plan，其他几家连不上请开 issue。
 
 **ChatGPT** 不用 Key：选它，点「使用 ChatGPT 继续」，在打开的浏览器里登录。Coo 的请求计入这个账号的 ChatGPT 套餐用量并受套餐的用量上限约束；到了上限，Coo 不再说话，每隔几分钟再试。
 

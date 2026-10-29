@@ -15,6 +15,9 @@
 .home-keyrow > label.home-modelfield { flex: 0 1 240px; }
 .home-keyrow input { width: 100%; }
 .home-keyrow > .btn { flex: none; height: 40px; }
+/* 网关地址(newAPI):在模型与 Key 上面单独一行,只对填地址的服务显示 */
+.home-urlrow { margin: 0 0 10px; }
+.home-urlrow[hidden] { display: none; }
 @media (max-width: 640px) { .home-picker { grid-template-columns: 1fr; } .home-pickerlabel { padding-top: 0; } .home-keyrow { flex-wrap: wrap; } }
 .home-vendor { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 8px; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--ink-soft); font: inherit; font-size: 13px; cursor: pointer; transition: border-color .15s, background .15s, color .15s; }
 .home-vendor[hidden] { display: none; }

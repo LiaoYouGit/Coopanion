@@ -4,7 +4,9 @@
  * scheme (features/schemes). The model card is one view:
  * the service in use on the first row (with 「测试连接」), every other one on the second (in the order
  * for the console's language; outside Chinese the services that take mainland China accounts only
- * behind a More button); the picked one's model and key boxes are below, and 「保存并开始」 saves the
+ * behind a More button; the newAPI gateway last, the one service whose address is the person's own,
+ * with a box for it above the model and key); the picked one's model and key boxes are below, and
+ * 「保存并开始」 saves the
  * key to that service's own endpoint on the platform for the language unless switched, tests it,
  * makes the endpoint active and resumes the run. ChatGPT is signed in instead: its pick hides the model
  * and key boxes, and the button opens the sign-in in the system browser (features/chatgpt), then
@@ -27,7 +29,7 @@ import { CHATGPT_TEXT, openInBrowser } from '../chatgpt/index.ts';
 import { signInReason } from 'cortico-provider-coo/src/strings.ts';
 import { readMode, requestMode } from '../mode.ts';
 import {
-  connectChatGPT, connectionVendor, connectVendor, consoleCall, defaultRegion, localized, readStatus, regionsOf, siteOf, testEndpoint, VENDOR_ICONS, vendorName, vendorsFor,
+  connectChatGPT, connectionVendor, connectVendor, consoleCall, defaultRegion, localized, NEWAPI, readStatus, regionsOf, siteOf, testEndpoint, VENDOR_ICONS, vendorName, vendorsFor,
   type ConnectResult, type Region, type Status, type Vendor,
 } from './model.ts';
 import { S } from './strings.ts';
@@ -64,7 +66,8 @@ async function mount(ctx: PageContext): Promise<void> {
   const modelMsg = ui.msgline('');
   const call = consoleCall(signal);
   const { shown, more } = vendorsFor(LANGUAGE);
-  const listed = [...shown, ...more];
+  // the gateway is not the guide's and the seed's business: it is listed here last, in every language
+  const listed = [...shown, ...more, NEWAPI];
   /** The service the key box is for: picked on the rows of logos. */
   let vendor: Vendor = shown[0]!;
   /** Which of the service's platforms, for a service with one per region. */
@@ -113,9 +116,17 @@ async function mount(ctx: PageContext): Promise<void> {
   const keyField = ui.field(S.keyLabel(vendorName(vendor, LANGUAGE)), keyInput);
   const modelField = ui.field(S.modelLabel, modelInput);
   modelField.classList.add('home-modelfield');
+  /** The gateway's address (newAPI): shown for the one service whose URL is the person's own. */
+  const urlInput = ui.input({});
+  urlInput.autocomplete = 'off';
+  urlInput.spellcheck = false;
+  urlInput.placeholder = 'https://…/v1';
+  const urlField = ui.field(S.addressLabel, urlInput);
+  urlField.classList.add('home-urlrow');
+  urlField.hidden = true;
   keyRow.append(modelField, keyField, modelList, save);
-  /** The active endpoint's service, platform and model, once the status is read. */
-  let active: { vendor: Vendor | null; region: Region | null; model: string } = { vendor: null, region: null, model: '' };
+  /** The active endpoint's service, platform, model and address, once the status is read. */
+  let active: { vendor: Vendor | null; region: Region | null; model: string; url: string } = { vendor: null, region: null, model: '', url: '' };
   /** The active endpoint when it is none of the listed services (set up by hand on the Model page). */
   let elsewhere: { title: string; model: string } | null = null;
   /** The key box is for the endpoint in use, whose saved key an empty box keeps. */
@@ -157,7 +168,10 @@ async function mount(ctx: PageContext): Promise<void> {
     placeVendors();
     keyInput.placeholder = inUse() ? S.keepKey : localized(v.keyHint, LANGUAGE);
     modelInput.value = inUse() && active.model ? active.model : v.model;
-    modelList.replaceChildren(...[v.model, ...(v.models ?? [])].map((m) => Object.assign(document.createElement('option'), { value: m })));
+    modelList.replaceChildren(...[v.model, ...(v.models ?? [])].filter(Boolean).map((m) => Object.assign(document.createElement('option'), { value: m })));
+    // in use, the saved address fills the box; an empty box keeps it on save
+    urlField.hidden = !v.customUrl;
+    urlInput.value = inUse() && active.url ? active.url : '';
     const label = keyField.querySelector('.fieldlabel');
     if (label) label.textContent = S.keyLabel(vendorName(v, LANGUAGE));
     getKey.textContent = S.getKey(vendorName(v, LANGUAGE));
@@ -184,7 +198,7 @@ async function mount(ctx: PageContext): Promise<void> {
   const links = ui.rowbar();
   links.classList.add('home-links');
   links.append(getKey, regionLink, ui.h('span', 'grow'), otherLink);
-  model.body.append(need, picker, keyRow, quota, links, modelMsg);
+  model.body.append(need, picker, urlField, keyRow, quota, links, modelMsg);
   root.append(model.el);
 
   /* ---------- pet ---------- */
@@ -236,7 +250,7 @@ async function mount(ctx: PageContext): Promise<void> {
     need.hidden = ready;
     const at = ready && mc ? connectionVendor(mc) : null;
     const current = at?.vendor ?? null;
-    active = { vendor: current, region: at?.region ?? null, model: mc?.model ?? '' };
+    active = { vendor: current, region: at?.region ?? null, model: mc?.model ?? '', url: mc?.baseUrl ?? '' };
     elsewhere = ready && !current && mc ? { title: mc.moduleTitle, model: mc.model ?? '' } : null;
     // the boxes start on the service in use, once
     if (!vendorShown && current) { vendorShown = true; pickVendor(current); }
@@ -273,10 +287,16 @@ async function mount(ctx: PageContext): Promise<void> {
     const key = keyInput.value.trim();
     // only the endpoint in use has a key saved to keep
     if (!key && !inUse()) { keyInput.focus(); return; }
+    // a gateway endpoint new needs its address and a model; in use, an empty box keeps what is saved
+    const url = urlInput.value.trim();
+    if (vendor.customUrl && !inUse()) {
+      if (!url) { urlInput.focus(); return; }
+      if (!modelInput.value.trim()) { modelInput.focus(); return; }
+    }
     save.disabled = true;
     try {
       testing();
-      const r = await connectVendor(call, vendor, key, modelInput.value, region);
+      const r = await connectVendor(call, vendor, key, modelInput.value, region, url);
       keyInput.value = '';
       showTest(r);
       if (r.ok) modelMsg.textContent = S.started;

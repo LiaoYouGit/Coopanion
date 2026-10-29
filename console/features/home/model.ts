@@ -6,7 +6,7 @@
 import { get, post } from '../../base/api.ts';
 import { connectChatGPT, connectVendor, testEndpoint, type ConnectResult, type WebUiCall } from 'cortico-provider-coo/src/connect.ts';
 
-export { connectionVendor, defaultRegion, localized, regionsOf, siteOf, vendorName, vendorsFor, type Region, type Vendor } from 'cortico-provider-coo/src/vendors.ts';
+export { connectionVendor, defaultRegion, localized, NEWAPI, regionsOf, siteOf, vendorName, vendorsFor, type Region, type Vendor } from 'cortico-provider-coo/src/vendors.ts';
 export { VENDOR_ICONS } from 'cortico-provider-coo/src/icons.ts';
 export { connectChatGPT, connectVendor, testEndpoint, type ConnectResult };
 

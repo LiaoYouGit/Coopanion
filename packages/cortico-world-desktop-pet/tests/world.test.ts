@@ -754,6 +754,22 @@ describe('chat page', () => {
     expect(chatItem(host.stored[0]!)).toMatchObject({ kind: 'say', beats: [], images: [{ mime: 'image/png' }] });
   });
 
+  it('pet_say carries the pictures to the pet page for the bubble, with a script or without one', async () => {
+    const { world, host } = await mounted();
+    const page = await FakePage.open(origin(world));
+    cleanup.push(() => page.close());
+    const cat = host.logBlobs.put(Buffer.from('cat'), 'image/png');
+
+    await tool(world, 'pet_say').handler({ script: '看这个', images: [cat] }, ctx);
+    expect(await page.next((m) => m.t === 'say')).toMatchObject({
+      beats: [{ text: '看这个' }],
+      images: [{ mime: 'image/png', base64: Buffer.from('cat').toString('base64') }],
+    });
+
+    await tool(world, 'pet_say').handler({ script: '', images: [cat] }, ctx);
+    expect(await page.next((m) => m.t === 'say')).toMatchObject({ beats: [], images: [{ mime: 'image/png', base64: Buffer.from('cat').toString('base64') }] });
+  });
+
   it('after the quiet minutes the pet starts a chat itself, but not while the quiet window holds', async () => {
     const { world, host } = await mounted((c) => { c.idleChat = { enabled: true, minutes: 0, quietFrom: '00:00', quietTo: '00:00' }; });
     const page = await FakePage.open(origin(world));

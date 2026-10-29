@@ -8,6 +8,7 @@ export const S: Partial<typeof en> = {
   toIntl: '改用國際平台',
   toCn: '改用中國大陸平台',
   keyLabel: (name: string) => `${name} 的 API Key`,
+  addressLabel: '閘道地址',
   modelLabel: '模型',
   keepKey: '留空沿用已儲存的 Key',
   getKey: (name: string) => `前往 ${name} 申請 Key`,

@@ -8,6 +8,7 @@ export const S: Partial<typeof en> = {
   toIntl: '국제 플랫폼 사용',
   toCn: '중국 본토 플랫폼 사용',
   keyLabel: (name: string) => `${name} API Key`,
+  addressLabel: '게이트웨이 주소',
   modelLabel: '모델',
   keepKey: '비워 두면 저장된 Key를 유지합니다',
   getKey: (name: string) => `${name} Key 발급받기`,

@@ -469,7 +469,7 @@ export async function createWhaleFigure(base = new URL('./', import.meta.url), o
   // the ninja run leans her whole body forward from the soles, in a straight line: bent at the waist instead,
   // the bodice comes away from the skirt and its bow and the tops of the legs show at the waist
   let wTilt = 0, wLean = 0, facing = 1;
-  let finMood = 0, tailMood = 0, wagAmp = 0, sitK = 0, walkK = 0, runK = 0, swingK = 0;
+  let finMood = 0, tailMood = 0, wagAmp = 0, wagPhase = 0, sitK = 0, walkK = 0, runK = 0, swingK = 0;
   const groupTilt = (mode, tilt, lean) => tilt * wTilt + lean * wLean + runK * 14 * facing;
   const st = { z: {}, alpha: {} };
 
@@ -585,7 +585,10 @@ export async function createWhaleFigure(base = new URL('./', import.meta.url), o
     const fins = sp.fins.step(finMood * 14 + sway * 10, dt) + (face === 'angry' ? 2.5 * Math.sin(t * 40) : 0) + flap * 13 * Math.sin(t * 26);
     const ahoge = sp.ahoge.step(-tiltVel * .12 - yawVel * .5 + sway * 18 + (face === 'surprised' ? -16 : 0) + (face === 'confused' ? 20 : 0) + (mode === 'sleep' ? 22 : 0) - hairY * 12, dt)
       + flap * 12 * Math.sin(t * 19);
-    const tail = sp.tail.step(sway * 14 + tailMood * 12, dt) + wagAmp * 13 * Math.sin(t * (4 + 5 * wagAmp)) + Math.sin(t * 1.3) * 3
+    // the wag's rate follows the mood, so its phase accumulates over the frames: time times a rate that
+    // changes would swing the phase already played by 5·t·ΔwagAmp, which grows with the session's age
+    wagPhase += (4 + 5 * wagAmp) * dt;
+    const tail = sp.tail.step(sway * 14 + tailMood * 12, dt) + wagAmp * 13 * Math.sin(wagPhase) + Math.sin(t * 1.3) * 3
       + flap * 14 * Math.sin(t * 17);
 
     /* legs: the kit hands hip→foot segments sized for Coo; keep their angle (forward = foot to the right) */
@@ -820,7 +823,7 @@ export async function createWhaleFigure(base = new URL('./', import.meta.url), o
     reset() {
       endFade();
       for (const k in sp) { sp[k].x = 0; sp[k].v = 0; }
-      lastT = null; rootWas = {}; prevTilt = 0; prevYaw = 0; prevLow = 0; headTilt = 0; wTilt = 0; wLean = 0; finMood = 0; tailMood = 0; wagAmp = 0; sitK = 0; walkK = 0; runK = 0; swingK = 0;
+      lastT = null; rootWas = {}; prevTilt = 0; prevYaw = 0; prevLow = 0; headTilt = 0; wTilt = 0; wLean = 0; finMood = 0; tailMood = 0; wagAmp = 0; wagPhase = 0; sitK = 0; walkK = 0; runK = 0; swingK = 0;
     },
     /** Loads every scheme's and outfit's textures, so later switches are immediate. */
     preload: () => Promise.all(SCHEMES.flatMap(sc => OUTFITS.map(of => loadScheme(sc.id, of.id)))),

@@ -310,7 +310,7 @@ function onOrder(m) {
     // the settings window's 「在桌面上隐藏」: the same as the menu's 「隐藏」
     case 'hide': host?.hide?.(); break;
     case 'type': openTyping(); break;
-    case 'say': dropAsks(); queue.push({ kind: 'say', id: m.id, beats: m.beats, i: -1 }); holdRoam(20); break;
+    case 'say': dropAsks(); queue.push({ kind: 'say', id: m.id, beats: m.beats?.length ? m.beats : m.images?.length ? [{ text: '' }] : [], images: (m.images || []).map((i) => `data:${i.mime};base64,${i.base64}`), i: -1 }); holdRoam(20); break;
     case 'ask': dropAsks(); queue.push({ kind: 'ask', id: m.id, question: m.question, options: m.options || [], own: m.own !== false }); holdRoam(20); break;
     case 'confirm': dropAsks(); queue.push({ kind: 'ask', confirm: true, id: m.id, question: m.question, options: m.options, own: false }); holdRoam(20); break;
     case 'walk': walk(m); break;
@@ -452,8 +452,18 @@ function startItem(it) {
   }
 }
 
-/** The pointer is on Coo's bubble: a line's countdown stands still meanwhile, so it can be read to the end or its link clicked. */
-const pointedAt = () => !bubble.hidden && bubble.matches(':hover');
+/**
+ * The pointer is on Coo's bubble: a line's countdown stands still meanwhile, so it can be read to the end or its
+ * link clicked. Decided from the cursor reports, not from `:hover`: on Windows a click-through window gets no
+ * mouse moves, so a hover that was on when the window went through never clears and the line would never let go.
+ */
+const pointedAt = () => {
+  if (bubble.hidden) return false;
+  const p = cursor.at;
+  if (!p) return false;
+  const r = bubble.getBoundingClientRect();
+  return p.x >= r.left - 4 && p.x <= r.right + 4 && p.y >= r.top - 4 && p.y <= r.bottom + 4;
+};
 
 function stepDialog(dt) {
   if (!item && queue.length && at() && !at().busy) startItem(queue.shift());
@@ -470,17 +480,21 @@ function stepDialog(dt) {
       let lead = 0;
       for (const a of b.actions || []) { acts.push(a); lead = .45; }
       it.shown = 0; it.acc = 0; it.fired = 0; it.startAt = T + lead;
-      if (b.text) { openBubble('say', '<p class="b-text"></p>'); sfx.pop(); } else { bubble.hidden = true; }
+      // the say's pictures ride in the first bubble that opens (pet_say images)
+      const pics = it.images?.length && !it.imgsShown ? `<div class="b-imgs b-pics">${it.images.map((src) => `<img alt="" src="${esc(src)}">`).join('')}</div>` : '';
+      if (b.text || pics) { openBubble('say', `${b.text ? '<p class="b-text"></p>' : ''}${pics}`); sfx.pop(); if (pics) { it.imgsShown = true; it.picsJustShown = true; } }
+      else bubble.hidden = true;
       return;
     }
     const b = it.beats[it.i];
     if (T < it.startAt) return;
-    if (!b.text) { it.beatDone = true; it.holdUntil = T + .8 / prefs.bubbleSpeed; return; }
+    if (!b.text) { it.beatDone = true; it.holdUntil = T + (.8 + (it.picsJustShown ? 2.8 : 0)) / prefs.bubbleSpeed; it.picsJustShown = false; return; }
     typeText(it, b.text, dt, b.anchors || []);
     if (it.shown >= b.text.length && !it.beatDone) {
       it.beatDone = true;
       const last = it.i === it.beats.length - 1;
-      it.holdUntil = T + (last ? 1.6 + b.text.length * .07 : .9 + b.text.length * .03) / prefs.bubbleSpeed;
+      it.holdUntil = T + ((last ? 1.6 + b.text.length * .07 : .9 + b.text.length * .03) + (it.picsJustShown ? 2.4 : 0)) / prefs.bubbleSpeed;
+      it.picsJustShown = false;
     }
     return;
   }

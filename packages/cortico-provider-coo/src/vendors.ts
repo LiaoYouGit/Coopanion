@@ -91,6 +91,13 @@ export interface Vendor {
    * `keyHint`, `secret` and the site's `keyUrl` are not used.
    */
   signIn?: true;
+  /**
+   * The base URL is the person's own (a gateway they point at): the Start page asks for it and sends
+   * it to `connectVendor`, and the service is recognized by its endpoint's name, since `locate`
+   * cannot match a URL it does not know. Its entry carries the site's protocol in `options.protocol`,
+   * for the same reason.
+   */
+  customUrl?: true;
 }
 
 const PASTE_KEY: Localized = {
@@ -271,6 +278,22 @@ export const CHATGPT: Vendor = {
 
 const vendorById = (id: string): Vendor | null => (id === CHATGPT.id ? CHATGPT : VENDORS.find((v) => v.id === id) ?? null);
 
+/**
+ * A newAPI gateway (https://github.com/QuantumNous/new-api): one OpenAI-compatible Chat address that
+ * serves whatever models its operator put behind it, keys created in the gateway's own console. The
+ * address is the person's, so the site states none and the entry pins the protocol; the Start page
+ * asks for the address and for a model. Listed there only, not in `VENDORS` and not in
+ * `vendorsFor`: `locate` has no URL to match and the guide's cards stay with services that own
+ * their address.
+ */
+export const NEWAPI: Vendor = {
+  id: 'newapi', names: brand('newAPI'), keyHint: hint('sk-'), secret: 'NEWAPI_API_KEY',
+  sites: { global: { baseUrl: '', protocol: 'chat', keyUrl: 'https://github.com/QuantumNous/new-api' } },
+  model: '', models: ['gpt-4o-mini', 'deepseek-chat', 'claude-sonnet-4-5', 'gemini-2.5-flash'],
+  vision: ['gpt-4o-mini', 'claude-sonnet-4-5', 'gemini-2.5-flash'],
+  customUrl: true,
+};
+
 /** The regions a service has separate platforms for; none for a service with one platform. */
 export const regionsOf = (v: Vendor): Region[] => ('global' in v.sites ? [] : [...REGIONS]);
 
@@ -325,10 +348,16 @@ export function vendorsFor(language: Language): { shown: Vendor[]; more: Vendor[
 /** The service a new install for `language` starts on. */
 export const firstVendor = (language: Language): Vendor => vendorsFor(language).shown[0]!;
 
-/** The service of the active endpoint as `/api/status` reports it: a ChatGPT plan by its module, the rest by base URL. */
-export function connectionVendor(connection: { module?: string; baseUrl?: string }): Located | null {
+/**
+ * The service of the active endpoint as `/api/status` reports it: a ChatGPT plan by its module, the
+ * rest by base URL, and a gateway (an address of the person's own) by its endpoint's name.
+ */
+export function connectionVendor(connection: { module?: string; baseUrl?: string; name?: string }): Located | null {
   if (connection.module === CHATGPT_MODULE) return { vendor: CHATGPT, region: null, site: siteOf(CHATGPT, 'cn') };
-  return locate(connection.baseUrl);
+  const located = locate(connection.baseUrl);
+  if (located) return located;
+  if (connection.name === endpointName(NEWAPI, 'cn')) return { vendor: NEWAPI, region: null, site: siteOf(NEWAPI, 'cn') };
+  return null;
 }
 
 /** A new ChatGPT plan endpoint with `model`; it has no key, the sign-in writes the account's tokens to its `.env`. */
@@ -345,13 +374,15 @@ export function chatgptEntry(model = CHATGPT.model) {
 
 /** A new endpoint's config for `v` on `region` (`kind: 'coo'`) with `model`; the key goes into its `.env` under `v.secret`. */
 export function vendorEntry(v: Vendor, model = v.model, region: Region = 'cn') {
+  const site = siteOf(v, region);
   return {
     kind: 'coo',
-    baseUrl: siteOf(v, region).baseUrl,
+    baseUrl: site.baseUrl,
     secret: v.secret,
     spec: { model, thinking: true, reasoningEffort: 'high', maxTokens: 8192 },
     multimodal: (v.vision ?? []).includes(model),
     pricing: [],
-    options: {},
+    // a service whose address locate() cannot match (a gateway) carries its protocol here; from the URL alone the endpoint would fall back to Responses
+    options: locate(site.baseUrl) ? {} : { protocol: site.protocol },
   };
 }

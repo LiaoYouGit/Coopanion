@@ -41,8 +41,8 @@ Coopanion is a desktop pet. **Coo** lives on the bottom edge of your screen: it 
 
 ## Features
 
-- **Many model services**: OpenAI, Anthropic, Gemini, xAI, OpenRouter, DeepSeek, Kimi, Qwen, MiniMax, Zhipu GLM, Doubao, Baidu Qianfan and StepFun with an API key, or a ChatGPT account through its ChatGPT plan.
-- **Chat**: hold the talk key and speak, or type; Coo answers in a bubble. Speech is recognized on your machine with FunASR or Whisper. After a quiet stretch Coo picks a topic of its own and says a line or two; it stays silent during the do-not-disturb window (22:00–08:00 by default, set under Pet → Behavior).
+- **Many model services**: OpenAI, Anthropic, Gemini, xAI, OpenRouter, DeepSeek, Kimi, Qwen, MiniMax, Zhipu GLM, Doubao, Baidu Qianfan and StepFun with an API key, a ChatGPT account through its ChatGPT plan, or a newAPI gateway by its address.
+- **Chat**: hold the talk key and speak, or type; Coo answers in a bubble. Speech is recognized on your machine with FunASR or Whisper.
 - **Memory**: Coo remembers what you talked about and when you poke it or pat its head. What it knows about you goes in `PARTNER.md` in its workspace, and every change to the workspace is kept as a version (the Windows build carries git; on macOS and Linux git has to be installed).
 - **Computer use**: clicking buttons, typing, switching windows. Coo asks before it acts.
 - **Activity bubbles**: an animated icon shows when Coo is thinking, reading, searching, writing or using the computer.
@@ -119,8 +119,9 @@ Select a service in Coo's bubble or on the Start page, create a key on its platf
 | Baidu Qianfan | [console.bce.baidu.com](https://console.bce.baidu.com/iam/#/iam/apikey/list) | `glm-5.3-flash` |
 | StepFun | [platform.stepfun.com](https://platform.stepfun.com/interface-key) | `step-3.7-flash` |
 | StepFun Step Plan | [platform.stepfun.com](https://platform.stepfun.com/interface-key) | `step-5-preview` (billed to the Step Plan subscription) |
+| newAPI gateway | your own deployment ([github.com/QuantumNous/new-api](https://github.com/QuantumNous/new-api)); the key is created in the gateway's console | any model the gateway serves |
 
-Each default is the fast, cheap, vision-capable tier of that vendor; change the name in the Model field on the Start page to use another. Kimi, Qwen, MiniMax and Zhipu GLM have separate mainland China and international platforms with separate accounts and keys; switch between them on the Start page. Doubao, Baidu Qianfan, StepFun and StepFun Step Plan take mainland China accounts only. Only DeepSeek, Anthropic and StepFun Step Plan have been tested with real keys; open an issue if another one fails.
+Each default is the fast, cheap, vision-capable tier of that vendor; change the name in the Model field on the Start page to use another. Kimi, Qwen, MiniMax and Zhipu GLM have separate mainland China and international platforms with separate accounts and keys; switch between them on the Start page. Doubao, Baidu Qianfan, StepFun and StepFun Step Plan take mainland China accounts only. The newAPI gateway sits at the end of the service row: pick it, enter your gateway's address (`https://…/v1`) and the name of a model it serves, then the key from the gateway's console. Only DeepSeek, Anthropic and StepFun Step Plan have been tested with real keys; open an issue if another one fails.
 
 **ChatGPT** takes no key: pick it, press **Continue with ChatGPT** and sign in in the browser that opens. Coo's requests count toward that account's ChatGPT plan and its usage limits; at the limit Coo goes quiet and tries again every few minutes.
 

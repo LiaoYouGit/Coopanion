@@ -26,3 +26,6 @@ VENDOR_ICONS.chatgpt = VENDOR_ICONS.openai!;
 
 /** Step Plan is StepFun's and takes the same mark. */
 VENDOR_ICONS['stepfun-plan'] = VENDOR_ICONS.stepfun!;
+
+/** newAPI has no mark of its own in the set: one source fanning out to two, drawn to match them. */
+VENDOR_ICONS.newapi = "<svg fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" viewBox=\"0 0 24 24\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"12\" cy=\"5\" r=\"2.6\"/><circle cx=\"5.5\" cy=\"19\" r=\"2.6\"/><circle cx=\"18.5\" cy=\"19\" r=\"2.6\"/><path d=\"M12 7.6v4.4M5.5 16.4V14a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.4\"/></svg>";

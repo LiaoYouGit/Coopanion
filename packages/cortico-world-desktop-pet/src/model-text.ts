@@ -22,7 +22,7 @@ interface SayReceipt {
   replaced: string | null;
   /** Markers left out: not in the vocabulary. */
   dropped: string[];
-  /** Images shown with it on the chat page. */
+  /** Images shown with it, in the bubble and on the chat page. */
   images: number;
 }
 
@@ -103,12 +103,12 @@ const zh = {
   sayEmpty: '[pet_say 没执行] 脚本是空的,也没带图片。不想说话就不调用。',
   sayReceipt: (r: SayReceipt) => `${r.waitSec > .5 ? `已排队,前面还有约 ${Math.round(r.waitSec)} 秒` : '已开始显示'},这段约 ${Math.round(r.selfSec)} 秒。`
     + (r.chatOpen ? '对话页开着,这段也显示在那里。' : '')
-    + (r.images ? `附带的 ${r.images} 张图片只显示在对话页。` : '')
+    + (r.images ? `附带的 ${r.images} 张图片也显示在气泡里。` : '')
     + (r.replaced !== null ? `替换了还没回答的提问「${r.replaced}」。` : '')
     + (r.dropped.length ? `\n[执行参数] 当前形象的词表里没有这些标记,已略过:${r.dropped.join('、')}。` : ''),
 
   /** `pet_say` with images and an empty script. */
-  imagesShown: (n: number, chatOpen: boolean) => `${n} 张图片已显示在对话页${chatOpen ? '' : ',对话页现在没有打开'}。`,
+  imagesShown: (n: number, chatOpen: boolean) => `${n} 张图片已在气泡里显示${chatOpen ? ',对话页也显示着' : ''}。`,
   /** 主动找对方说话的事件。 */
   idleChat: (minutes: number) => `已经 ${minutes} 分钟没有互动了。可以主动找个话题说一两句(pet_say),比如求对方摸摸你、聊聊昨晚做的梦、分享自己碰到的小趣事;刚说过的别重复,对方不想聊就安静待着。`,
   /** fallbackText of an image `pet_say` showed; that event is stored, never delivered. */
@@ -231,12 +231,12 @@ const en: typeof zh = {
       ? `Queued behind about ${Math.round(r.waitSec)} s of earlier lines; this one takes about ${Math.round(r.selfSec)} s.`
       : `Showing now; this one takes about ${Math.round(r.selfSec)} s.`,
     r.chatOpen ? 'The chat page is open and shows it too.' : '',
-    r.images ? `The ${r.images} image${r.images > 1 ? 's' : ''} with it show only on the chat page.` : '',
+    r.images ? `The ${r.images} image${r.images > 1 ? 's' : ''} with it show in the bubble too.` : '',
     r.replaced !== null ? `Replaced the unanswered question "${r.replaced}".` : '',
   ].filter(Boolean).join(' ')
     + (r.dropped.length ? `\n[arguments] These markers are not in the current figure's vocabulary and were skipped: ${r.dropped.join(', ')}.` : ''),
 
-  imagesShown: (n, chatOpen) => `${n} image${n > 1 ? 's' : ''} shown on the chat page${chatOpen ? '' : ', which is not open right now'}.`,
+  imagesShown: (n, chatOpen) => `${n} image${n > 1 ? 's' : ''} shown in the bubble${chatOpen ? ', the chat page shows them too' : ''}.`,
   /** The internal event that asks the pet to start a little chat itself. */
   idleChat: (minutes) => `No interaction for ${minutes} minutes. You could start a little chat yourself (pet_say) — ask the person to pet you, talk about the dream you had last night, share a little anecdote of your own; do not repeat what you just said, and if the person is not in the mood, stay quiet.`,
   shownImage: (i, total) => `[image ${i}/${total} shown on the chat page]`,

@@ -217,6 +217,9 @@ body.desk .floor{display:none}
 .b-img img{display:block; width:100%; height:100%; object-fit:cover}
 .b-img button{position:absolute; top:2px; right:2px; width:18px; height:18px; padding:0; border:0; border-radius:50%; background:rgba(0,0,0,.55); color:#fff; font-size:13px; line-height:18px; cursor:pointer}
 .b-note{margin-top:6px}
+/* the say's own pictures under its text (pet_say images): stickers read at up to 150 px */
+.bubble .b-pics{margin:8px 0 0; flex-wrap:wrap}
+.b-pics img{display:block; max-width:100%; max-height:calc(150px * var(--bubble-size, 1)); border-radius:calc(10px * var(--bubble-size, 1))}
 /* an app's conversation: one step per bubble, with the answer's controls under Coo's line */
 .d-mark{color:var(--skin-eye); font-weight:700}
 .bubble.talk{width:min(calc(318px * var(--bubble-size, 1)), calc(100vw - 20px)); max-width:none; padding:calc(11px * var(--bubble-size, 1)) calc(14px * var(--bubble-size, 1)) calc(12px * var(--bubble-size, 1))}

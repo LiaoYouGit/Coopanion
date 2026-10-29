@@ -12,8 +12,8 @@ import type { Request } from 'cortico/protocol/open-responses/index.ts';
 import { functionCall, functionResult, message } from 'cortico/protocol/open-responses/context.ts';
 import { RESERVED_FRAME_NAMES } from 'cortico/core/loop.ts';
 import { blobLine } from 'cortico/core/blobs.ts';
-import COO, { OFF_PEAK, VENDORS, VENDOR_ICONS, protocolOf, vendorEntry, vendorOf } from '../src/index.ts';
-import { PROTOCOLS, endpointName, locate, regionsOf, siteOf } from '../src/vendors.ts';
+import COO, { NEWAPI, OFF_PEAK, VENDORS, VENDOR_ICONS, protocolOf, vendorEntry, vendorOf } from '../src/index.ts';
+import { PROTOCOLS, connectionVendor, endpointName, locate, regionsOf, siteOf } from '../src/vendors.ts';
 import { connectVendor, type WebUiCall } from '../src/connect.ts';
 
 const entry = (patch: Partial<LLMProviderEntry> = {}): LLMProviderEntry => ({
@@ -342,6 +342,19 @@ describe('Coo Pet Provider', () => {
     expect(vendorOf('http://127.0.0.1:1234/v1')).toBeNull();
   });
 
+  it('tells the newAPI gateway from its endpoint name, since its address is the person’s own', () => {
+    expect(NEWAPI.customUrl).toBe(true);
+    expect(endpointName(NEWAPI, 'cn')).toBe('newapi');
+    // the entry pins the protocol the URL table cannot supply; a listed address keeps its options empty
+    expect(vendorEntry(NEWAPI, 'gpt-4o-mini')).toMatchObject({ kind: 'coo', options: { protocol: 'chat' } });
+    expect(vendorEntry(VENDORS[0]!, 'm').options).toEqual({});
+    // a listed URL wins over the endpoint's name; the gateway's own address is matched by the name
+    const deepseek = siteOf(VENDORS[0]!, 'cn').baseUrl;
+    expect(connectionVendor({ name: 'newapi', baseUrl: deepseek })).toMatchObject({ vendor: { id: 'deepseek' } });
+    expect(connectionVendor({ name: 'newapi', baseUrl: 'https://gw.example.com/v1' })).toMatchObject({ vendor: { id: 'newapi' }, region: null });
+    expect(connectionVendor({ name: 'other', baseUrl: 'https://gw.example.com/v1' })).toBeNull();
+  });
+
   it("sends each protocol to its own path with its own key header; a listed URL takes its platform's protocol", async () => {
     const seen: Array<{ path: string; headers: IncomingHttpHeaders }> = [];
     const replies: Record<string, object> = {
@@ -418,5 +431,16 @@ describe('connecting a service through the WebUI routes', () => {
     const { call, calls } = fakeConsole([], false);
     expect(await connectVendor(call, qwen, 'bad')).toEqual({ ok: false, ms: null, why: '密钥无效' });
     expect(calls.some(([p]) => p.endsWith('/activate') || p === '/api/run/resume')).toBe(false);
+  });
+
+  it('saves the address typed for the gateway, on create and on the existing endpoint', async () => {
+    const fresh = fakeConsole([], true);
+    expect(await connectVendor(fresh.call, NEWAPI, 'sk-1', 'gpt-4o-mini', 'cn', 'https://gw.example.com/v1')).toEqual({ ok: true, ms: 42, why: null });
+    expect(fresh.calls[1]![1]).toEqual({ name: 'newapi', entry: { ...vendorEntry(NEWAPI, 'gpt-4o-mini'), baseUrl: 'https://gw.example.com/v1' }, secretValue: 'sk-1' });
+    const saved = fakeConsole(['newapi'], true);
+    await connectVendor(saved.call, NEWAPI, '', 'deepseek-chat', 'cn', 'https://other.example.com/v1');
+    expect(saved.calls[2]).toEqual(['/api/providers/newapi/save', {
+      name: 'newapi', entry: { kind: 'coo', spec: { model: 'deepseek-chat' }, multimodal: false, baseUrl: 'https://other.example.com/v1' }, expectedRevision: 'r1', secretValue: undefined,
+    }]);
   });
 });

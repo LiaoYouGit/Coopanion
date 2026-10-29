@@ -8,6 +8,7 @@ export const S: Partial<typeof en> = {
   toIntl: 'Utiliser la plateforme internationale',
   toCn: 'Utiliser la plateforme de Chine continentale',
   keyLabel: (name: string) => `API Key ${name}`,
+  addressLabel: 'Adresse de la passerelle',
   modelLabel: 'Modèle',
   keepKey: 'Laisser vide pour garder la clé enregistrée',
   getKey: (name: string) => `Obtenir une clé ${name}`,

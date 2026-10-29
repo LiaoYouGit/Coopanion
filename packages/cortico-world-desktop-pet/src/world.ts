@@ -1791,7 +1791,12 @@ export class DesktopPetWorld implements World {
     const { beats, dropped } = parseScript(script, this.vocab());
     const spoken = beats.some((b) => b.text || b.actions.length || b.anchors.length);
     if (!spoken && shown.blobs.length === 0) return { text: this.t.sayEmpty, failed: true };
-    if (spoken && !this.server.sendPet({ t: 'say', id: nextId('s'), beats })) return this.notConnected('pet_say');
+    // the pictures ride along for the bubble as data urls; the chat page takes them from the record as before
+    // (shownImages only ever produces the bytes form)
+    const pics = shown.blobs.map((b) => ('bytes' in b ? { mime: b.mime, base64: Buffer.from(b.bytes).toString('base64') } : null))
+      .filter((p): p is { mime: string; base64: string } => p !== null);
+    const sent = this.server.sendPet({ t: 'say', id: nextId('s'), beats, ...(pics.length ? { images: pics } : {}) });
+    if (spoken && !sent) return this.notConnected('pet_say');
     void this.closeActivity();
     void this.record({ kind: 'say', beats: beats.map((b) => ({ text: b.text, ...moodOf(b.actions, this.vocab()) })) }, beats.map((b) => b.text).join(''), shown.blobs);
     this.idleChatArm(); // a line it says itself also opens the next quiet stretch

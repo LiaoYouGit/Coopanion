@@ -50,24 +50,30 @@ export async function testEndpoint(call: WebUiCall, name: string): Promise<Conne
  * and once the test passes makes it the active endpoint and resumes the run, which starts paused
  * without a key. An empty `key` keeps the one the endpoint has; a new endpoint needs one. An empty
  * `model` keeps the endpoint's model, or takes the service's default for a new endpoint. `region`
- * matters only for a service with a platform per region.
+ * matters only for a service with a platform per region. A non-empty `baseUrl` is saved as the
+ * endpoint's address, for a service whose address is the person's own (`customUrl`); an empty one
+ * keeps what the endpoint has.
  */
-export async function connectVendor(call: WebUiCall, vendor: Vendor, key: string, model = '', region: Region = 'cn'): Promise<ConnectResult> {
+export async function connectVendor(call: WebUiCall, vendor: Vendor, key: string, model = '', region: Region = 'cn', baseUrl = ''): Promise<ConnectResult> {
   const secretValue = key.trim() || undefined;
   const typed = model.trim();
+  const url = baseUrl.trim();
   const name = endpointName(vendor, region);
   try {
     const list = await call<{ providers: Array<{ name: string }> }>('/api/providers');
     if (list.providers.some((p) => p.name === name)) {
       const d = await call<Detail>(`/api/providers/${encodeURIComponent(name)}`);
       const entry = { ...d.entry };
+      if (url) entry.baseUrl = url;
       if (typed) {
         entry.spec = { ...(d.entry.spec as Record<string, unknown> | undefined), model: typed };
         entry.multimodal = (vendor.vision ?? []).includes(typed);
       }
       await call(`/api/providers/${encodeURIComponent(name)}/save`, { name: d.name, entry, expectedRevision: d.revision, secretValue });
     } else {
-      await call('/api/providers', { name, entry: vendorEntry(vendor, typed || vendor.model, region), secretValue });
+      const entry = vendorEntry(vendor, typed || vendor.model, region);
+      if (url) entry.baseUrl = url;
+      await call('/api/providers', { name, entry, secretValue });
     }
   } catch (err) {
     return { ok: false, ms: null, why: errText(err) };

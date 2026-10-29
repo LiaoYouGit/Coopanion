@@ -8,6 +8,7 @@ export const S: Partial<typeof en> = {
   toIntl: 'Использовать международную платформу',
   toCn: 'Использовать платформу для материкового Китая',
   keyLabel: (name: string) => `API Key для ${name}`,
+  addressLabel: 'Адрес шлюза',
   modelLabel: 'Модель',
   keepKey: 'Оставьте пустым, чтобы сохранить текущий API Key',
   getKey: (name: string) => `Получить API Key на сайте ${name}`,

@@ -186,7 +186,7 @@ export default COO;
 export { OFF_PEAK } from './pricing.ts';
 export { plainRemote } from './address.ts';
 export {
-  CHATGPT, VENDORS, defaultRegion, localized, siteOf, vendorEntry, vendorName, vendorOf, vendorsFor,
+  CHATGPT, NEWAPI, VENDORS, defaultRegion, localized, siteOf, vendorEntry, vendorName, vendorOf, vendorsFor,
   type Language, type Localized, type Protocol, type Region, type Site, type Vendor,
 } from './vendors.ts';
 export { VENDOR_ICONS } from './icons.ts';
